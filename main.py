@@ -1,5 +1,6 @@
 import pickle
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record
+from notes_book import NotesBook
 
 
 def parse_input(user_input):
@@ -95,6 +96,30 @@ def show_birthday(args, book: AddressBook):
     return str(book.find(name).birthday)
 
 
+@add_birthday_error
+def add_email(args, book: AddressBook):
+    # TODO
+    return "Email added."
+
+
+@input_error
+def show_email(args, book: AddressBook):
+    # TODO
+    return 'Email'
+
+
+@add_birthday_error
+def add_address(args, book: AddressBook):
+    # TODO
+    return "Address added."
+
+
+@input_error
+def show_address(args, book: AddressBook):
+    # TODO
+    return 'Address'
+
+
 @input_error
 def show_phones(args, book: AddressBook):
     name = args[0]
@@ -112,59 +137,116 @@ def show_all(book: AddressBook):
 
 @input_error
 def birthdays(book: AddressBook):
+    # TODO add parameter with days length
     if (len(book) == 0):
         return "No contacts."
     else:
         return book.get_birthdays_per_week()
 
 
+@input_error
+def add_note(args, book: NotesBook):
+    # TODO
+    return "Note added."
+
+
+@input_error
+def delete_note(args, book: NotesBook):
+    # TODO
+    return 'Delete note'
+
+
+@input_error
+def change_note(args, book: NotesBook):
+    # TODO
+    return "Note changed."
+
+
+@input_error
+def show_all_notes(args, book: NotesBook):
+    # TODO
+    return 'All notes'
+
+
 def load_from_file():
     try:
         with open('address_book.pkl', 'rb') as f:
-            book = pickle.load(f)
+            address_book = pickle.load(f)
+        with open('notes_book.pkl', 'rb') as f:
+            notes_book = pickle.load(f)
     except:
-        book = AddressBook()
+        address_book = AddressBook()
+        notes_book = NotesBook()
 
-    return book
+    return address_book, notes_book
 
 
-def save_to_file(book):
+def save_to_file(address_book, notes_book):
     with open('address_book.pkl', 'wb') as f:
-        pickle.dump(book, f)
+        pickle.dump(address_book, f)
+    with open('notes_book.pkl', 'wb') as f:
+        pickle.dump(notes_book, f)
+
+
+# TODO
+def print_all_commands():
+    print("all_commands")
+
+
+def handle_command(command, args, address_book, notes_book):
+    if command == "hello":
+        print("How can I help you?")
+    elif command == "add":
+        print(add_contact(args, address_book))
+    elif command == "delete":
+        print(delete_contact(args, address_book))
+    elif command == "change":
+        print(change_contact(args, address_book))
+    elif command == "add-birthday":
+        print(add_birthday(args, address_book))
+    elif command == "show-birthday":
+        print(show_birthday(args, address_book))
+    elif command == "add-email":
+        print(add_email(args, address_book))
+    elif command == "show-email":
+        print(show_email(args, address_book))
+    elif command == "add-address":
+        print(add_address(args, address_book))
+    elif command == "show-address":
+        print(show_address(args, address_book))
+    elif command == "phone":
+        print(show_phones(args, address_book))
+    elif command == "all":
+        print(show_all(address_book))
+    elif command == "birthdays":
+        print(birthdays(address_book))
+    elif command == "add-note":
+        print(add_note(args, notes_book))
+    elif command == "change-note":
+        print(change_note(args, notes_book))
+    elif command == "delete-note":
+        print(delete_note(args, notes_book))
+    elif command == "all-notes":
+        print(show_all_notes(args, notes_book))
+    else:
+        print("Invalid command.")
 
 
 def main():
-    book = load_from_file()
+    address_book, notes_book = load_from_file()
 
     print("Welcome to the assistant bot!")
+    print_all_commands()
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
-            save_to_file(book)
+            save_to_file(address_book, notes_book)
             print("Good bye!")
             break
-        elif command == "hello":
-            print("How can I help you?")
-        elif command == "add":
-            print(add_contact(args, book))
-        elif command == "delete":
-            print(delete_contact(args, book))
-        elif command == "change":
-            print(change_contact(args, book))
-        elif command == "add-birthday":
-            print(add_birthday(args, book))
-        elif command == "show-birthday":
-            print(show_birthday(args, book))
-        elif command == "phone":
-            print(show_phones(args, book))
-        elif command == "all":
-            print(show_all(book))
-        elif command == "birthdays":
-            print(birthdays(book))
         else:
-            print("Invalid command.")
+            handle_command(command, args, address_book, notes_book)
 
 
 if __name__ == "__main__":
