@@ -188,9 +188,32 @@ def save_to_file(address_book, notes_book):
         pickle.dump(notes_book, f)
 
 
-# TODO
 def print_all_commands():
-    print("all_commands")
+    print("Command list:")
+    print("- add-address [name] [address]:                      |          Add an address, str. etc")
+    print("- add-birthday [name] [birthdate]:                   |          Add the birthdate for the specified contact.")
+    print("- add [name] [phone]:                                |          Add a new contact with name and phone number.")
+    print("- add-email [name] [email]:                          |          Add an email to the specified contact, regexp, error handling without program termination.")
+    print("- add-note [title] [text]:                           |          Add a note.")
+    print("- add-tag [title] [tag]:                             |          Add a tag to the note.")
+    print("- all:                                               |          Show all contacts in the address book.")
+    print("- all-notes:                                         |          Show all notes.")
+    print("- birthdays:                                         |          Show birthdays that will occur within 7 days.")
+    print("- birthdays [days number]:                           |          Show birthdays that will occur within the specified number of days.")
+    print("- change-address [name] [address]:                   |          Change the address for the specified contact.")
+    print("- change-email [name] [new email]:                   |          Change the email for the specified contact.")
+    print("- change-phone [name] [old phone] [new phone]:       |          Change the phone number for the specified contact.")
+    print("- change-note [title] [text]:                        |          Change a note.")
+    print("- delete-contact [name]:                             |          Delete the entire contact record.")
+    print("- delete-note [title]:                               |          Delete a note.")
+    print("- delete-tag [title][tag]:                           |          Delete a tag from the note.")
+    print("- hello:                                             |          Show 'How can I help you?'")
+    print("- phone [name]:                                      |          Show the phone number for the specified contact.")
+    print("- search-tag [tag]:                                  |          Show notes by tag.")
+    print("- show-address [name]:                               |          Show the address for the specified contact.")
+    print("- show-birthday [name]:                              |          Show the birthdate for the specified contact.")
+    print("- show-email [name]:                                 |          Show the email for the specified contact.")
+    print("- show-note [title]:                                 |          Show a note.")
 
 
 def handle_command(command, args, address_book, notes_book):
