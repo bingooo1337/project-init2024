@@ -143,9 +143,10 @@ class AddressBook(UserDict):
     def delete(self, name):
         del self.data[name]
 
-    def get_birthdays_per_week(self):
+    def get_birthdays_per_week(self, days_count: int):
         users_to_congratulate_by_days = self._get_users_to_congratulate(
-            self.data.values()
+            self.data.values(),
+            days_count
         )
 
         lines = []
@@ -154,9 +155,9 @@ class AddressBook(UserDict):
 
         return '\n'.join(lines)
 
-    def _get_users_to_congratulate(self, users: list[Record]):
+    def _get_users_to_congratulate(self, users: list[Record], days_count: int):
         start = datetime.now().date()
-        end = (start + timedelta(days=6))
+        end = (start + timedelta(days=days_count - 1))
 
         users_to_congratulate = defaultdict(list)
         for user in users:
