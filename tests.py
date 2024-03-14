@@ -27,6 +27,15 @@ notesBook.add_note(note_4)
 print("print_all_notes:")
 notesBook.print_all_notes()
 
+print("add_tags:")
+print(note_1.title)
+notesBook.add_tags(note_1.title.value, "організм", "вода")
+notesBook.print_notes([note_1])
+
+print("delete_tags:")
+notesBook.delete_tags(note_1.title.value, "організм", "вода")
+notesBook.print_notes([note_1])
+
 print("find_note_by_title:")
 print(notesBook.find_note_by_title("Важливість води для організму"))
 

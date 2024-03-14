@@ -1,4 +1,5 @@
 from collections import UserDict
+import re
 from address_book import Field
 
 
@@ -77,7 +78,7 @@ class NotesBook(UserDict):
         if note.title.value in self.data:
             del self.data[note.title.value]
         else:
-            raise KeyError(f"Note with title '{note.title.value}' not found.")
+            raise KeyError(f"Нотатка '{note.title.value}' не знайдена.")
 
     def get_all_notes(self) -> list:
         return list(self.data.values())
@@ -105,5 +106,27 @@ class NotesBook(UserDict):
     def sort_notes_by_tags(self, notes, tags=None):
         if tags is not None:
            sorted_notes = sorted(notes, key=lambda note: any(tag in note.tags for tag in tags), reverse=True)
-           return sorted_notes
+           return sorted_notes        
+        
+    def add_tags(self, title: str, *tags: str):
+        print(f"title = {title}")
+        if title in self.data:
+            for tag in tags:
+                self.data[title].tags.append(tag)
+        else:
+            raise KeyError(f"Нотатка '{title}' не знайдена.")
+
+    def delete_tags(self, title: str, *tags: str):
+        if title in self.data:
+            for tag in tags:
+                if tag in self.data[title].tags:
+                    self.data[title].tags.remove(tag)
+                else:
+                    raise ValueError(f"Тег '{tag}' не знайдений в нотатці '{title}'.")
+        else:
+            raise KeyError(f"Нотатка '{title}' не знайдена.")
+        
+    
+
+
     
