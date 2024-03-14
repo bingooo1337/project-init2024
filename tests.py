@@ -29,11 +29,11 @@ notesBook.print_all_notes()
 
 print("add_tags:")
 print(note_1.title)
-notesBook.add_tags(note_1.title.value, "організм", "вода")
+note_1.add_tags("організм", "вода")
 notesBook.print_notes([note_1])
 
 print("delete_tags:")
-notesBook.delete_tags(note_1.title.value, "організм", "вода")
+note_1.delete_tags("організм", "вода")
 notesBook.print_notes([note_1])
 
 print("find_note_by_title:")

@@ -45,6 +45,16 @@ class Note:
     def tags(self, value: list):
         self._tags = value
 
+    def add_tags(self, *tags: str):
+        self._tags.extend(tags)
+
+    def delete_tags(self, *tags: str):
+        for tag in tags:
+            if tag in self._tags:
+                self._tags.remove(tag)
+            else:
+                raise ValueError(f"Тег '{tag}' не знайдений.")
+
     def print_before_repr(method):
         def wrapper(self):
             print("#========================")
@@ -105,27 +115,4 @@ class NotesBook(UserDict):
     def sort_notes_by_tags(self, notes, tags=None):
         if tags is not None:
            sorted_notes = sorted(notes, key=lambda note: any(tag in note.tags for tag in tags), reverse=True)
-           return sorted_notes        
-        
-    def add_tags(self, title: str, *tags: str):
-        print(f"title = {title}")
-        if title in self.data:
-            for tag in tags:
-                self.data[title].tags.append(tag)
-        else:
-            raise KeyError(f"Нотатка '{title}' не знайдена.")
-
-    def delete_tags(self, title: str, *tags: str):
-        if title in self.data:
-            for tag in tags:
-                if tag in self.data[title].tags:
-                    self.data[title].tags.remove(tag)
-                else:
-                    raise ValueError(f"Тег '{tag}' не знайдений в нотатці '{title}'.")
-        else:
-            raise KeyError(f"Нотатка '{title}' не знайдена.")
-        
-    
-
-
-    
+           return sorted_notes
