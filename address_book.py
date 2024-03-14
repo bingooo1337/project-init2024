@@ -127,7 +127,7 @@ class Record:
         self.birthday = Birthday(birthday)
 
     def __str__(self):
-        res = f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        res = f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}"
         if (self.birthday != None):
             res += f", birthday: {self.birthday}"
         return res
