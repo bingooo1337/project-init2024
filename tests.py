@@ -23,7 +23,6 @@ notesBook.add_note(note_2)
 notesBook.add_note(note_3)
 notesBook.add_note(note_4)
 
-# print(notesBook.get_all_notes())
 print("print_all_notes:")
 notesBook.print_all_notes()
 
@@ -47,7 +46,6 @@ print("sort_notes_by_tags")
 all_notes = notesBook.get_all_notes()
 sorted_notes = notesBook.sort_notes_by_tags(all_notes, ["здоров'я", 'харчування'])
 notesBook.print_notes(sorted_notes)
-# notesBook.print_all_notes()
 
 print("edite_note:")
 note_to_edit = notesBook.find_note_by_title("Секрети успішного управління часом")

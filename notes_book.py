@@ -10,11 +10,6 @@ class Description(Field):
     def __init__(self, value):
         super().__init__(value)  
 
-class Tag(Field):
-    def __init__(self, value):
-        super().__init__(value)
-
-
 class Note:
     def __init__(self, title) -> None:
         self._title = Title(title)
