@@ -1,5 +1,4 @@
 import pickle
-import re
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record, InvalidEmailException, Email
 from notes_book import NotesBook
 
@@ -77,6 +76,10 @@ def birthdays_input_validator(func):
 def add_address_validator(func):
     def inner(*args, **kwargs):
         try:
+            # args after name
+            address_parts = args[0][1:]
+            if (len(address_parts) < 1):
+                raise ValueError
             return func(*args, **kwargs)
         except ValueError:
             return "Give me name and address please."
@@ -89,8 +92,9 @@ def add_address_validator(func):
 def add_contact(args, book: AddressBook):
     name, phone = args
 
-    new_record = book.find(name)
-    if (new_record == None):
+    try:
+        new_record = book.find(name)
+    except KeyError:
         new_record = Record(name)
 
     new_record.add_phone(phone)
@@ -127,7 +131,8 @@ def add_birthday(args, book: AddressBook):
 @base_input_validator
 def show_birthday(args, book: AddressBook):
     name = args[0]
-    return str(book.find(name).birthday)
+    birthday = book.find(name).birthday
+    return str(birthday) if birthday != None else "No birthday info."
 
 
 @base_input_validator
@@ -158,14 +163,23 @@ def show_email(args, book: AddressBook):
 @add_address_validator
 @base_input_validator
 def add_address(args, book: AddressBook):
-    # TODO
-    return "Address added."
+    name, *address_parts = args
+    record = book.find(name)
+    had_address = record.address != None
+
+    # concatenate everything after name
+    address = ' '.join(address_parts)
+    record.add_address(address)
+
+    return "Address changed." if had_address else "Address added."
 
 
 @base_input_validator
 def show_address(args, book: AddressBook):
-    # TODO
-    return 'Address'
+    name = args[0]
+    record = book.find(name)
+    address = record.address
+    return str(address) if address != None else "No address."
 
 
 @base_input_validator
