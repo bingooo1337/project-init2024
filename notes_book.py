@@ -1,5 +1,4 @@
 from collections import UserDict
-import re
 from address_book import Field
 
 
