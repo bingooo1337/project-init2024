@@ -8,14 +8,14 @@
 
 ## Встановлення
 
-1. Клонуйте репозиторій на свій комп'ютер:
-https://github.com/bingooo1337/project-init2024
+1. Склонуйте репозиторій на свій комп'ютер:
+    git clone https://github.com/bingooo1337/project-init2024
 
 2. Перейдіть у каталог з проектом:
-cd project-init2024
+    cd project-init2024
 
-3. Запустіть програму:
-python main.py
+3. Виконайте наступну команду в терміналі для збудування програми та її встановлення:
+    python3 setup.py build --build-lib=. && python3 setup.py install
 
 ## Використання
 
@@ -39,7 +39,7 @@ python main.py
 
 ## Ліцензія
 
-Цей проект ліцензований під ліцензією [MIT License](LICENSE).
+Цей проект ліцензований під ліцензією [MIT License](https://opensource.org/license/MIT).
 
 ## Контактна інформація
 
