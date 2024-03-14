@@ -152,13 +152,32 @@ def show_all(book: AddressBook):
         return '\n'.join(str(record) for record in book.values())
 
 
-@input_error
-def birthdays(book: AddressBook):
-    # TODO add parameter with days length
+def birthdays_error(func):
+    def inner(*args, **kwargs):
+        try:
+            params = args[0]
+            if (len(params) > 0):
+                days_count = int(params[0])
+                if (days_count < 1):
+                    return "Give me the number of days > 0"
+
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me the number of days > 0"
+
+    return inner
+
+
+@birthdays_error
+def birthdays(args, book: AddressBook):
     if (len(book) == 0):
         return "No contacts."
     else:
-        return book.get_birthdays_per_week()
+        # one week by default
+        days_count = 7
+        if (len(args) > 0):
+            days_count = int(args[0])
+        return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 
 @input_error
@@ -238,7 +257,7 @@ def handle_command(command, args, address_book, notes_book):
     elif command == "all":
         print(show_all(address_book))
     elif command == "birthdays":
-        print(birthdays(address_book))
+        print(birthdays(args, address_book))
     elif command == "add-note":
         print(add_note(args, notes_book))
     elif command == "change-note":
