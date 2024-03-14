@@ -1,6 +1,10 @@
 __pycache__/
+.env/
+
 address_book.pkl
 notes_book.pkl
 
 # my files
 .DS_Store
+.gitignore
+.gitignore
