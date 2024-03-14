@@ -186,11 +186,4 @@ class AddressBook(UserDict):
             congratulation_day = birthday_this_year.replace(
                 year=today.year + 1)
 
-        weekday = congratulation_day.weekday()
-        # 4 - Friday index
-        if (weekday > 4):
-            # birthday is on weekend, congratulation on next work day
-            congratulation_day = congratulation_day + \
-                timedelta(days=7 - weekday)
-
         return congratulation_day
