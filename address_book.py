@@ -19,15 +19,19 @@ class Name(Field):
 class InvalidPhoneException(Exception):
     pass
 
+
 class InvalidEmailException(Exception):
     pass
+
 
 def phone_validator(func):
     def inner(*args, **kwargs):
         if (len(args[1]) != 10):
             raise InvalidPhoneException
         return func(*args, **kwargs)
+
     return inner
+
 
 def email_validator(func):
     def inner(*args, **kwargs):
@@ -36,7 +40,9 @@ def email_validator(func):
         if not re.fullmatch(regex, email):
             raise InvalidEmailException
         return func(*args, **kwargs)
+
     return inner
+
 
 class Phone(Field):
     @phone_validator
@@ -70,6 +76,7 @@ def birthday_validator(func):
         except ValueError:
             raise InvalidBirthDateFormatException
         return func(*updated_args, **kwargs)
+
     return inner
 
 
@@ -137,13 +144,12 @@ class Record:
         self.address = Address(address)
 
     def __str__(self):
-        res = f"Contact name: {self.name.value}; phones: {', '.join(
-            p.value for p in self.phones)}"
-        if (self.birthday != None):
+        res = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        if (self.birthday is not None):
             res += f"; birthday: {self.birthday}"
         if (len(self.emails) > 0):
             res += f"; email(s): {', '.join(e.value for e in self.emails)}"
-        if (self.address != None):
+        if (self.address is not None):
             res += f"; address: {self.address}"
         return res
 
@@ -176,7 +182,7 @@ class AddressBook(UserDict):
 
         users_to_congratulate = defaultdict(list)
         for user in users:
-            if (user.birthday == None):
+            if (user.birthday is None):
                 continue
 
             congratulation_day = self._get_congratulation_day(

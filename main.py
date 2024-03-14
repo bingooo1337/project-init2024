@@ -1,5 +1,6 @@
 import pickle
-from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record, InvalidEmailException, Email
+from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
+    Record, InvalidEmailException
 from notes_book import NotesBook
 
 
@@ -114,7 +115,7 @@ def delete_contact(args, book: AddressBook):
 def change_contact(args, book: AddressBook):
     name, old_phone, new_phone = args
     record = book.find(name)
-    if (record.find_phone(old_phone) == None):
+    if record.find_phone(old_phone) is None:
         return "No such phone."
     record.edit_phone(old_phone, new_phone)
     return "Contact updated."
@@ -132,7 +133,7 @@ def add_birthday(args, book: AddressBook):
 def show_birthday(args, book: AddressBook):
     name = args[0]
     birthday = book.find(name).birthday
-    return str(birthday) if birthday != None else "No birthday info."
+    return str(birthday) if birthday is not None else "No birthday info."
 
 
 @base_input_validator
@@ -165,7 +166,7 @@ def show_email(args, book: AddressBook):
 def add_address(args, book: AddressBook):
     name, *address_parts = args
     record = book.find(name)
-    had_address = record.address != None
+    had_address = record.address is not None
 
     # concatenate everything after name
     address = ' '.join(address_parts)
@@ -179,7 +180,7 @@ def show_address(args, book: AddressBook):
     name = args[0]
     record = book.find(name)
     address = record.address
-    return str(address) if address != None else "No address."
+    return str(address) if address is not None else "No address."
 
 
 @base_input_validator
