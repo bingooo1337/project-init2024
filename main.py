@@ -1,5 +1,6 @@
 import pickle
-from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record
+import re
+from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record, InvalidEmailException, Email
 from notes_book import NotesBook
 
 
@@ -21,6 +22,8 @@ def input_error(func):
             return "Give me name please."
         except InvalidPhoneException:
             return "Phone number length should be 10."
+        except InvalidEmailException:
+            return "Please provide a valid email."
 
     return inner
 
@@ -35,6 +38,8 @@ def change_contact_error(func):
             return "No such contact."
         except InvalidPhoneException:
             return "Phone number length should be 10."
+        except InvalidEmailException:
+            return "Please provide a valid email."
 
     return inner
 
@@ -96,17 +101,29 @@ def show_birthday(args, book: AddressBook):
     return str(book.find(name).birthday)
 
 
-@add_birthday_error
+@input_error
 def add_email(args, book: AddressBook):
-    # TODO
-    return "Email added."
+    name, email = args
+    book.find(name).add_email(email)
+    return "Email has been added."
+
+
+@change_contact_error
+def change_email(args, book:AddressBook):
+    name, old_email, new_email = args
+    record = book.find(name)
+    if (record.find_email(old_email) is None):
+        return "No such email."
+    record.change_email(old_email, new_email)
+    return "Email has been changed."
 
 
 @input_error
 def show_email(args, book: AddressBook):
-    # TODO
-    return 'Email'
-
+    name = args[0]
+    emails = book.find(name).emails
+    return '; '.join(email.value for email in emails)
+    
 
 @add_birthday_error
 def add_address(args, book: AddressBook):
@@ -135,13 +152,32 @@ def show_all(book: AddressBook):
         return '\n'.join(str(record) for record in book.values())
 
 
-@input_error
-def birthdays(book: AddressBook):
-    # TODO add parameter with days length
+def birthdays_error(func):
+    def inner(*args, **kwargs):
+        try:
+            params = args[0]
+            if (len(params) > 0):
+                days_count = int(params[0])
+                if (days_count < 1):
+                    return "Give me the number of days > 0"
+
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me the number of days > 0"
+
+    return inner
+
+
+@birthdays_error
+def birthdays(args, book: AddressBook):
     if (len(book) == 0):
         return "No contacts."
     else:
-        return book.get_birthdays_per_week()
+        # one week by default
+        days_count = 7
+        if (len(args) > 0):
+            days_count = int(args[0])
+        return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 
 @input_error
@@ -235,6 +271,8 @@ def handle_command(command, args, address_book, notes_book):
         print(add_email(args, address_book))
     elif command == "show-email":
         print(show_email(args, address_book))
+    elif command == "change-email":
+        print(change_email(args, address_book))
     elif command == "add-address":
         print(add_address(args, address_book))
     elif command == "show-address":
@@ -244,7 +282,7 @@ def handle_command(command, args, address_book, notes_book):
     elif command == "all":
         print(show_all(address_book))
     elif command == "birthdays":
-        print(birthdays(address_book))
+        print(birthdays(args, address_book))
     elif command == "add-note":
         print(add_note(args, notes_book))
     elif command == "change-note":
