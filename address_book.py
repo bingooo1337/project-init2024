@@ -1,5 +1,6 @@
 from collections import UserDict, defaultdict
 from datetime import datetime, timedelta
+import re
 
 
 class Field:
@@ -18,6 +19,8 @@ class Name(Field):
 class InvalidPhoneException(Exception):
     pass
 
+class InvalidEmailException(Exception):
+    pass
 
 def phone_validator(func):
     def inner(*args, **kwargs):
@@ -26,12 +29,25 @@ def phone_validator(func):
         return func(*args, **kwargs)
     return inner
 
+def email_validator(func):
+    def inner(*args, **kwargs):
+        email = args[1]
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+        if not re.fullmatch(regex, email):
+            raise InvalidEmailException
+        return func(*args, **kwargs)
+    return inner
 
 class Phone(Field):
     @phone_validator
     def __init__(self, value):
         super().__init__(value)
 
+
+class Email(Field):
+    @email_validator
+    def __init__(self, value):
+        super().__init__(value)
 
 class InvalidBirthDateFormatException(Exception):
     pass
@@ -67,6 +83,7 @@ class Record:
         self.name = Name(name)
         self.phones = []
         self.birthday = None
+        self.emails = []
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -87,12 +104,30 @@ class Record:
                 return p
         return None
 
+    def add_email(self, email):
+        self.emails.append(Email(email))
+
+    def remove_email(self, email):
+        self.emails = [e for e in self.emails if e.value != email]
+
+    def change_email(self, old_email, new_email):
+        old = Email(old_email)
+        for i, email in enumerate(self.emails):
+            if (email.value == old.value):
+                self.emails[i] = Email(new_email)
+
+    def find_email(self, email):
+        find = Email(email)
+        for e in self.emails:
+            if (e.value == find.value):
+                return e
+        return None
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
     def __str__(self):
-        res = f"Contact name: {self.name.value}, phones: {
-            '; '.join(p.value for p in self.phones)}"
+        res = f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}"
         if (self.birthday != None):
             res += f", birthday: {self.birthday}"
         return res

@@ -1,5 +1,6 @@
 import pickle
-from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record
+import re
+from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record, InvalidEmailException, Email
 from notes_book import NotesBook
 
 
@@ -21,6 +22,8 @@ def input_error(func):
             return "Give me name please."
         except InvalidPhoneException:
             return "Phone number length should be 10."
+        except InvalidEmailException:
+            return "Please provide a valid email."
 
     return inner
 
@@ -35,6 +38,8 @@ def change_contact_error(func):
             return "No such contact."
         except InvalidPhoneException:
             return "Phone number length should be 10."
+        except InvalidEmailException:
+            return "Please provide a valid email."
 
     return inner
 
@@ -96,17 +101,29 @@ def show_birthday(args, book: AddressBook):
     return str(book.find(name).birthday)
 
 
-@add_birthday_error
+@input_error
 def add_email(args, book: AddressBook):
-    # TODO
-    return "Email added."
+    name, email = args
+    book.find(name).add_email(email)
+    return "Email has been added."
+
+
+@change_contact_error
+def change_email(args, book:AddressBook):
+    name, old_email, new_email = args
+    record = book.find(name)
+    if (record.find_email(old_email) is None):
+        return "No such email."
+    record.change_email(old_email, new_email)
+    return "Email has been changed."
 
 
 @input_error
 def show_email(args, book: AddressBook):
-    # TODO
-    return 'Email'
-
+    name = args[0]
+    emails = book.find(name).emails
+    return '; '.join(email.value for email in emails)
+    
 
 @add_birthday_error
 def add_address(args, book: AddressBook):
@@ -210,6 +227,8 @@ def handle_command(command, args, address_book, notes_book):
         print(add_email(args, address_book))
     elif command == "show-email":
         print(show_email(args, address_book))
+    elif command == "change-email":
+        print(change_email(args, address_book))
     elif command == "add-address":
         print(add_address(args, address_book))
     elif command == "show-address":
