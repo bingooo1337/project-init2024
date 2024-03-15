@@ -5,7 +5,10 @@ from notes_book import NotesBook
 
 
 def parse_input(user_input):
-    cmd, *args = user_input.split()
+    if len(user_input) > 0:
+        cmd, *args = user_input.split()
+    else:
+        cmd, *args = '', []
     cmd = cmd.strip().lower()
     return cmd, *args
 
