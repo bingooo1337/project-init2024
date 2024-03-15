@@ -84,6 +84,10 @@ class Record:
         self.phones = []
         self.birthday = None
         self.emails = []
+        self.address = None
+
+    def add_address(self, address: str):
+        self.address = address
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))

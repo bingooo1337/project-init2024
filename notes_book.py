@@ -41,9 +41,10 @@ class Note:
         self._tags = value
 
     def add_tags(self, *tags: str):
-        self._tags.extend(tags)
+        for tag in tags:
+            self._tags.append(tag)
 
-    def delete_tags(self, *tags: str):
+    def delete_tags(self, tags):
         for tag in tags:
             if tag in self._tags:
                 self._tags.remove(tag)
@@ -58,7 +59,7 @@ class Note:
         
     @print_before_repr
     def __repr__(self):
-        return f"title={self.title.value}\ndescription={self.description.value if self.description else None}\ntags={self.tags})\n"
+        return f"title={self.title.value}\ndescription={self.description.value if self.description else None}\ntags={self.tags}\n"
 
 
 class NotesBook(UserDict):
@@ -101,9 +102,10 @@ class NotesBook(UserDict):
             return None
 
     def find_notes_by_tags(self, tags: list) -> list:
+        cleaned_tags = [tag.strip('\'"') for tag in tags]
         found_notes = []
         for note in self.data.values():
-            if any(tag in note.tags for tag in tags):
+            if any(cleaned_tag in note.tags for cleaned_tag in cleaned_tags):
                 found_notes.append(note)
         return found_notes
 
