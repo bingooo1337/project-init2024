@@ -208,3 +208,13 @@ class AddressBook(UserDict):
                 year=today.year + 1)
 
         return congratulation_day
+    
+    def today_birthdays(self):
+        today = datetime.now()
+        birthdays_today = []
+
+        for name in self:
+            record = self.find(name)
+            if record.birthday is not None and record.birthday.value.day == today.day and record.birthday.value.month == today.month:
+                birthdays_today.append(name)
+        return birthdays_today
