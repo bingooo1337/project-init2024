@@ -266,7 +266,7 @@ def change_note(args, book: NotesBook):
     if note is not None:
         new_description = input("Enter note description: ")
         if new_description.strip() == "":
-            new_description = note.description
+            new_description = note.description.value
 
         new_tags_input = input("Enter note tags separated by commas: ")
         if new_tags_input.strip() == "":
