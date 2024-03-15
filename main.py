@@ -236,8 +236,8 @@ def birthdays(args, book: AddressBook):
 @note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
-    description = input("Введіть опис нотатки: ")
-    tags_input = input("Введіть теги нотатки через кому : ")
+    description = input("Enter note description: ")
+    tags_input = input("Enter note tags separated by commas: ")
 
     cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
 
@@ -245,7 +245,7 @@ def add_note(args, book: NotesBook):
     note.description = description
     note.tags = cleaned_tags
     book.add_note(note)
-    return f"Нотатка '{title}' створена."
+    return f"Note '{title}' is created."
 
 @note_error
 def delete_note(args, book: NotesBook):
@@ -253,9 +253,9 @@ def delete_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         book.delete_note(note)
-        return f"Нотатка '{title}' видалена."
+        return f"Note '{title}' is successfuly deleted."
     else:
-        return f"Нотатка '{title}' не знайдена."
+        return f"Note '{title}' is not found."
 
 
 @note_error
@@ -264,15 +264,18 @@ def change_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
 
     if note is not None:
-        new_description = input("Введіть опис нотатки: ")
+        new_description = input("Enter note description: ")
         if new_description.strip() == "":
             new_description = note.description
 
-        new_tags_input = input("Введіть теги нотатки через кому: ")
+        new_tags_input = input("Enter note tags separated by commas: ")
         if new_tags_input.strip() == "":
             new_tags = note.tags
         else:
-            new_tags = new_tags_input.split(r',\s*')
+            new_tags = new_tags_input.split(',')
+        book.edite_note(note, title=None, description=new_description, tags=new_tags)
+    return f"Note '{note.title}' is successfuly changed."
+
 
 @note_error
 def show_all_notes(book: NotesBook):
@@ -283,33 +286,34 @@ def show_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        print(note)
+        return note
     else:
-        return f"Нотатка '{title}' не знайдена."
+        return f"Note '{title}' is not found."
 
 @note_error
 def add_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Введіть теги нотатки через кому : ").split(r',\s*')
-        note.add_tags(*tags)
-        return f"Теги {tags} до нотатки '{title}' додано."
+        tags = input("Enter note tags separated by commas: ").split(',')
+        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+        note.add_tags(cleaned_tags)
+        return f"Tags {cleaned_tags} of note '{title}' are added."
     else:
-        return f"Нотатка '{title}' не знайдена."
+        return f"Note '{title}' is not found."
 
 @note_error
 def delete_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Введіть теги для видалення через кому: ").split(',')
+        tags = input("Enter note tags for deleting separated by commas: ").split(',')
         cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
 
         note.delete_tags(cleaned_tags)
-        return f"Теги {tags} з нотатки '{title}' видалено."
+        return f"Tags {tags} from note '{title}' are deleted."
     else:
-        return f"Нотатка '{title}' не знайдена."
+        return f"Note '{title}' is not found."
 
 @note_error
 def search_tags(args, book: NotesBook):

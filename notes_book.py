@@ -40,7 +40,7 @@ class Note:
     def tags(self, value: list):
         self._tags = value
 
-    def add_tags(self, *tags: str):
+    def add_tags(self, tags: str):
         for tag in tags:
             self._tags.append(tag)
 
@@ -49,17 +49,11 @@ class Note:
             if tag in self._tags:
                 self._tags.remove(tag)
             else:
-                raise ValueError(f"Тег '{tag}' не знайдений.")
-
-    def print_before_repr(method):
-        def wrapper(self):
-            print("#========================")
-            return method(self)
-        return wrapper
+                raise ValueError(f"Tag '{tag}' is not found.")
         
-    @print_before_repr
     def __repr__(self):
-        return f"title={self.title.value}\ndescription={self.description.value if self.description else None}\ntags={self.tags}\n"
+        head = "#========================\n"
+        return f"{head}title={self.title}\ndescription={self.description if self.description else None}\ntags={self.tags}\n"
 
 
 class NotesBook(UserDict):
@@ -83,7 +77,7 @@ class NotesBook(UserDict):
         if note.title.value in self.data:
             del self.data[note.title.value]
         else:
-            raise KeyError(f"Нотатка '{note.title.value}' не знайдена.")
+            raise KeyError(f"Note '{note.title.value}' is not found.")
 
     def get_all_notes(self) -> list:
         return list(self.data.values())
