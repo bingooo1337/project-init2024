@@ -41,7 +41,7 @@ def add_contact_validator(func):
     return inner
 
 
-def change_contact_validator(func):
+def change_phone_validator(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -123,9 +123,9 @@ def delete_contact(args, book: AddressBook):
     return "Contact deleted."
 
 
-@change_contact_validator
+@change_phone_validator
 @base_input_validator
-def change_contact(args, book: AddressBook):
+def change_phone(args, book: AddressBook):
     name, old_phone, new_phone = args
     record = book.find(name)
     if record.find_phone(old_phone) is None:
@@ -157,7 +157,7 @@ def add_email(args, book: AddressBook):
     return "Email has been added."
 
 
-@change_contact_validator
+@change_phone_validator
 @base_input_validator
 def change_email(args, book: AddressBook):
     name, old_email, new_email = args
@@ -279,10 +279,10 @@ def handle_command(command, args, address_book, notes_book):
         print("How can I help you?")
     elif command == "add":
         print(add_contact(args, address_book))
-    elif command == "delete":
+    elif command == "delete-contact":
         print(delete_contact(args, address_book))
-    elif command == "change":
-        print(change_contact(args, address_book))
+    elif command == "change-phone":
+        print(change_phone(args, address_book))
     elif command == "add-birthday":
         print(add_birthday(args, address_book))
     elif command == "show-birthday":
