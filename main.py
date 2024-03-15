@@ -1,5 +1,4 @@
 import pickle
-from datetime import datetime
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
     Record, InvalidEmailException
 from notes_book import NotesBook
@@ -323,7 +322,7 @@ def main():
     birthdays_today = address_book.today_birthdays()
     if birthdays_today:
         names = ", ".join(birthdays_today)
-        print(f"Greetings! There are birthdays in your Address Book today! Do not forget to congratulate {names}! ")
+        print(f"Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
     print_all_commands()
     while True:
         user_input = input("Enter a command: ")
