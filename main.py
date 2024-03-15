@@ -1,6 +1,6 @@
 import pickle
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
-    Record, InvalidEmailException, Email, Phone
+    Record, InvalidEmailException
 from notes_book import NotesBook, Note
 
 
@@ -12,13 +12,13 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
 
-    def note_error(func):
-        def inner(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except ValueError as e:
-                return str(e)
-        return inner
+def note_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as e:
+            return str(e)
+    return inner
 
 
 def base_input_validator(func):
@@ -233,7 +233,7 @@ def birthdays(args, book: AddressBook):
         return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 
-@base_input_validator
+@note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
     description = input("Введіть опис нотатки: ")
@@ -247,7 +247,7 @@ def add_note(args, book: NotesBook):
     book.add_note(note)
     return f"Нотатка '{title}' створена."
 
-@base_input_validator
+@note_error
 def delete_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
@@ -258,7 +258,7 @@ def delete_note(args, book: NotesBook):
         return f"Нотатка '{title}' не знайдена."
 
 
-@base_input_validator
+@note_error
 def change_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
@@ -274,14 +274,9 @@ def change_note(args, book: NotesBook):
         else:
             new_tags = new_tags_input.split(r',\s*')
 
-@base_input_validator
-def show_all_notes(args, book: NotesBook):
-    # TODO
-    return 'All notes'
-        book.edite_note(note, description=new_description, tags=new_tags)
-        return f"Нотатка '{title}' змінена."
-    else:
-        return f"Нотатка '{title}' не знайдена."
+@note_error
+def show_all_notes(book: NotesBook):
+    book.print_all_notes()
 
 @note_error
 def show_note(args, book: NotesBook):
@@ -309,7 +304,8 @@ def delete_tags(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         tags = input("Введіть теги для видалення через кому: ").split(',')
-        cleaned_tags = [tag.strip('\'"') for tag in tags]
+        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+
         note.delete_tags(cleaned_tags)
         return f"Теги {tags} з нотатки '{title}' видалено."
     else:
@@ -394,7 +390,7 @@ def handle_command(command, args, address_book, notes_book):
     elif command == "delete-note":
         print(delete_note(args, notes_book))
     elif command == "all-notes":
-        notes_book.print_all_notes()
+        show_all_notes(notes_book)
     else:
         print("Invalid command.")
 
