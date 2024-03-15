@@ -1,7 +1,7 @@
 import pickle
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
     Record, InvalidEmailException
-from notes_book import NotesBook
+from notes_book import NotesBook, Note
 
 
 def parse_input(user_input):
@@ -11,6 +11,14 @@ def parse_input(user_input):
         cmd, *args = '', []
     cmd = cmd.strip().lower()
     return cmd, *args
+
+def note_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as e:
+            return str(e)
+    return inner
 
 
 def base_input_validator(func):
@@ -225,28 +233,96 @@ def birthdays(args, book: AddressBook):
         return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 
-@base_input_validator
+@note_error
 def add_note(args, book: NotesBook):
-    # TODO
-    return "Note added."
+    title = " ".join(args)
+    description = input("Enter note description: ")
+    tags_input = input("Enter note tags separated by commas: ")
 
+    cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
 
-@base_input_validator
+    note = Note(title)
+    note.description = description
+    note.tags = cleaned_tags
+    book.add_note(note)
+    return f"Note '{title}' is created."
+
+@note_error
 def delete_note(args, book: NotesBook):
-    # TODO
-    return 'Delete note'
+    title = " ".join(args)
+    note = book.find_note_by_title(title)
+    if (note is not None):
+        book.delete_note(note)
+        return f"Note '{title}' is successfuly deleted."
+    else:
+        return f"Note '{title}' is not found."
 
 
-@base_input_validator
+@note_error
 def change_note(args, book: NotesBook):
-    # TODO
-    return "Note changed."
+    title = " ".join(args)
+    note = book.find_note_by_title(title)
+
+    if note is not None:
+        new_description = input("Enter note description: ")
+        if new_description.strip() == "":
+            new_description = note.description.value
+
+        new_tags_input = input("Enter note tags separated by commas: ")
+        if new_tags_input.strip() == "":
+            new_tags = note.tags
+        else:
+            new_tags = new_tags_input.split(',')
+        book.edite_note(note, title=None, description=new_description, tags=new_tags)
+    return f"Note '{note.title}' is successfuly changed."
 
 
-@base_input_validator
-def show_all_notes(args, book: NotesBook):
-    # TODO
-    return 'All notes'
+@note_error
+def show_all_notes(book: NotesBook):
+    book.print_all_notes()
+
+@note_error
+def show_note(args, book: NotesBook):
+    title = " ".join(args)
+    note = book.find_note_by_title(title)
+    if (note is not None):
+        return note
+    else:
+        return f"Note '{title}' is not found."
+
+@note_error
+def add_tags(args, book: NotesBook):
+    title = " ".join(args)
+    note = book.find_note_by_title(title)
+    if (note is not None):
+        tags = input("Enter note tags separated by commas: ").split(',')
+        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+        note.add_tags(cleaned_tags)
+        return f"Tags {cleaned_tags} of note '{title}' are added."
+    else:
+        return f"Note '{title}' is not found."
+
+@note_error
+def delete_tags(args, book: NotesBook):
+    title = " ".join(args)
+    note = book.find_note_by_title(title)
+    if (note is not None):
+        tags = input("Enter note tags for deleting separated by commas: ").split(',')
+        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+
+        note.delete_tags(cleaned_tags)
+        return f"Tags {tags} from note '{title}' are deleted."
+    else:
+        return f"Note '{title}' is not found."
+
+@note_error
+def search_tags(args, book: NotesBook):
+    tags = args
+    notes = book.find_notes_by_tags(tags)
+    if (notes is not None):
+        book.print_notes(notes)
+    else:
+        print(f"Нотатки з тегами '{tags}' не знайдено.")
 
 
 def load_from_file():
@@ -332,10 +408,18 @@ def handle_command(command, args, address_book, notes_book):
         print(add_note(args, notes_book))
     elif command == "change-note":
         print(change_note(args, notes_book))
+    elif command == "show-note":
+        print(show_note(args, notes_book))
+    elif command == "add-tags":
+        print(add_tags(args, notes_book))
+    elif command == "delete-tags":
+        print(delete_tags(args, notes_book))
+    elif command == "search-tags":
+        search_tags(args, notes_book)
     elif command == "delete-note":
         print(delete_note(args, notes_book))
     elif command == "all-notes":
-        print(show_all_notes(args, notes_book))
+        show_all_notes(notes_book)
     else:
         print("Invalid command.")
 
