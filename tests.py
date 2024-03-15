@@ -51,7 +51,7 @@ notesBook.print_notes(sorted_notes)
 
 print("edite_note:")
 note_to_edit = notesBook.find_note_by_title("Секрети успішного управління часом")
-print(notesBook.edite_note(note_to_edit, title="Успішне управління часом", tags=['продуктивність', 'організація']))
+print(notesBook.edit_note(note_to_edit, title="Успішне управління часом", tags=['продуктивність', 'організація']))
 
 print("delete_note:")
 notesBook.delete_note(note_4)

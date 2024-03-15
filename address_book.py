@@ -164,6 +164,23 @@ class AddressBook(UserDict):
     def delete(self, name):
         del self.data[name]
 
+    def search_contacts(self, search_word):
+        word = search_word.lower()
+        results = []
+        for record in self.values():
+            # combine all info into one searchable line
+            record_info = ' '.join([
+                record.name.value,
+                ' '.join(e.value for e in record.phones),
+                ' '.join(e.value for e in record.emails),
+                str(record.birthday) if record.birthday is not None else '',
+                record.address.value if record.address is not None else '',
+            ]).lower()
+
+            if word in record_info:
+                results.append(record)
+        return results
+
     def get_birthdays_per_week(self, days_count: int):
         users_to_congratulate_by_days = self._get_users_to_congratulate(
             self.data.values(),

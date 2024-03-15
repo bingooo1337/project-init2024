@@ -12,12 +12,14 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
 
+
 def note_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except ValueError as e:
             return str(e)
+
     return inner
 
 
@@ -105,6 +107,16 @@ def add_address_validator(func):
             return func(*args, **kwargs)
         except ValueError:
             return "Give me name and address please."
+
+    return inner
+
+
+def find_contact_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except IndexError:
+            return "Give me search word please."
 
     return inner
 
@@ -212,6 +224,17 @@ def show_phones(args, book: AddressBook):
     return '; '.join(phone.value for phone in phones)
 
 
+@find_contact_validator
+def find_contact(args, book: AddressBook):
+    search_word = args[0]
+    result = book.search_contacts(search_word)
+
+    if not result:
+        return "No result."
+    else:
+        return '\n'.join(str(record) for record in result)
+
+
 @base_input_validator
 def show_all(book: AddressBook):
     if (len(book) == 0):
@@ -247,13 +270,14 @@ def add_note(args, book: NotesBook):
     book.add_note(note)
     return f"Note '{title}' is created."
 
+
 @note_error
 def delete_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
         book.delete_note(note)
-        return f"Note '{title}' is successfuly deleted."
+        return f"Note '{title}' is successfully deleted."
     else:
         return f"Note '{title}' is not found."
 
@@ -273,13 +297,14 @@ def change_note(args, book: NotesBook):
             new_tags = note.tags
         else:
             new_tags = new_tags_input.split(',')
-        book.edite_note(note, title=None, description=new_description, tags=new_tags)
-    return f"Note '{note.title}' is successfuly changed."
+        book.edit_note(note, title=None, description=new_description, tags=new_tags)
+    return f"Note '{note.title}' is successfully changed."
 
 
 @note_error
 def show_all_notes(book: NotesBook):
     book.print_all_notes()
+
 
 @note_error
 def show_note(args, book: NotesBook):
@@ -289,6 +314,7 @@ def show_note(args, book: NotesBook):
         return note
     else:
         return f"Note '{title}' is not found."
+
 
 @note_error
 def add_tags(args, book: NotesBook):
@@ -301,6 +327,7 @@ def add_tags(args, book: NotesBook):
         return f"Tags {cleaned_tags} of note '{title}' are added."
     else:
         return f"Note '{title}' is not found."
+
 
 @note_error
 def delete_tags(args, book: NotesBook):
@@ -315,6 +342,7 @@ def delete_tags(args, book: NotesBook):
     else:
         return f"Note '{title}' is not found."
 
+
 @note_error
 def search_tags(args, book: NotesBook):
     tags = args
@@ -322,7 +350,7 @@ def search_tags(args, book: NotesBook):
     if (notes is not None):
         book.print_notes(notes)
     else:
-        print(f"Нотатки з тегами '{tags}' не знайдено.")
+        print(f"No notes with tags '{tags}' found.")
 
 
 def load_from_file():
@@ -400,6 +428,8 @@ def handle_command(command, args, address_book, notes_book):
         print(show_address(args, address_book))
     elif command == "phone":
         print(show_phones(args, address_book))
+    elif command == "find-contact":
+        print(find_contact(args, address_book))
     elif command == "all":
         print(show_all(address_book))
     elif command == "birthdays":
