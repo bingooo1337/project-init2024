@@ -1,29 +1,30 @@
 import pickle
-import re
-from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, Record, InvalidEmailException, Email, Phone
+from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
+    Record, InvalidEmailException, Email, Phone
 from notes_book import NotesBook, Note
 
 
 def parse_input(user_input):
-    cmd, *args = user_input.split()
+    if len(user_input) > 0:
+        cmd, *args = user_input.split()
+    else:
+        cmd, *args = '', []
     cmd = cmd.strip().lower()
     return cmd, *args
 
+    def note_error(func):
+        def inner(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except ValueError as e:
+                return str(e)
+        return inner
 
-def note_error(func):
+
+def base_input_validator(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError as e:
-            return str(e)        
-    return inner
-
-def input_error(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ValueError:
-            return "Give me name and phone please."
         except KeyError:
             return "No such contact."
         except IndexError:
@@ -32,47 +33,90 @@ def input_error(func):
             return "Phone number length should be 10."
         except InvalidEmailException:
             return "Please provide a valid email."
-
-
-    return inner
-
-
-def change_contact_error(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ValueError:
-            return "Give me name, old phone and new phone please."
-        except KeyError:
-            return "No such contact."
-        except InvalidPhoneException:
-            return "Phone number length should be 10."
-        except InvalidEmailException:
-            return "Please provide a valid email."
-
-    return inner
-
-
-def add_birthday_error(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except KeyError:
-            return "No such contact."
-        except ValueError:
-            return "Give me name and birthday please."
         except InvalidBirthDateFormatException:
             return "Birthday should have format DD.MM.YYYY."
 
     return inner
 
 
-@input_error
+def add_contact_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and phone please."
+
+    return inner
+
+
+def change_phone_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name, old phone and new phone please."
+
+    return inner
+
+
+def add_birthday_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and birthday please."
+
+    return inner
+
+
+def birthdays_input_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            params = args[0]
+            if (len(params) > 0):
+                days_count = int(params[0])
+                if (days_count < 1):
+                    return "Give me the number of days > 0"
+
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me the number of days > 0"
+
+    return inner
+
+
+def add_email_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and email."
+
+    return inner
+
+
+def add_address_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            # args after name
+            address_parts = args[0][1:]
+            if (len(address_parts) < 1):
+                raise ValueError
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and address please."
+
+    return inner
+
+
+@add_contact_validator
+@base_input_validator
 def add_contact(args, book: AddressBook):
     name, phone = args
 
-    new_record = book.find(name)
-    if (new_record == None):
+    try:
+        new_record = book.find(name)
+    except KeyError:
         new_record = Record(name)
 
     new_record.add_phone(phone)
@@ -80,45 +124,50 @@ def add_contact(args, book: AddressBook):
     return "Contact added."
 
 
-@input_error
+@base_input_validator
 def delete_contact(args, book: AddressBook):
     name = args[0]
     book.delete(name)
     return "Contact deleted."
 
 
-@change_contact_error
+@change_phone_validator
+@base_input_validator
 def change_phone(args, book: AddressBook):
     name, old_phone, new_phone = args
     record = book.find(name)
-    if (record.find_phone(old_phone) == None):
+    if record.find_phone(old_phone) is None:
         return "No such phone."
     record.edit_phone(old_phone, new_phone)
     return "Contact updated."
 
 
-@add_birthday_error
+@add_birthday_validator
+@base_input_validator
 def add_birthday(args, book: AddressBook):
     name, birthday = args
     book.find(name).add_birthday(birthday)
     return "Birthday added."
 
 
-@input_error
+@base_input_validator
 def show_birthday(args, book: AddressBook):
     name = args[0]
-    return str(book.find(name).birthday)
+    birthday = book.find(name).birthday
+    return str(birthday) if birthday is not None else "No birthday info."
 
 
-@input_error
+@add_email_validator
+@base_input_validator
 def add_email(args, book: AddressBook):
     name, email = args
     book.find(name).add_email(email)
     return "Email has been added."
 
 
-@change_contact_error
-def change_email(args, book:AddressBook):
+@change_phone_validator
+@base_input_validator
+def change_email(args, book: AddressBook):
     name, old_email, new_email = args
     record = book.find(name)
     if (record.find_email(old_email) is None):
@@ -127,37 +176,43 @@ def change_email(args, book:AddressBook):
     return "Email has been changed."
 
 
-@input_error
+@base_input_validator
 def show_email(args, book: AddressBook):
     name = args[0]
     emails = book.find(name).emails
-    return '; '.join(email.value for email in emails)
-    
+    return '; '.join(email.value for email in emails) if len(emails) > 0 else "No email."
 
+
+@add_address_validator
+@base_input_validator
 def add_address(args, book: AddressBook):
-    name, *address = args
-    book.find(name).add_address(" ".join(address))
-    return "Адреса додана."
+    name, *address_parts = args
+    record = book.find(name)
+    had_address = record.address is not None
 
-def change_address(args, book: AddressBook):
-    add_address(args, book)
-    return ("Адреса змінена.")
+    # concatenate everything after name
+    address = ' '.join(address_parts)
+    record.add_address(address)
+
+    return "Address changed." if had_address else "Address added."
 
 
-@input_error
+@base_input_validator
 def show_address(args, book: AddressBook):
     name = args[0]
-    return book.find(name).address
+    record = book.find(name)
+    address = record.address
+    return str(address) if address is not None else "No address."
 
 
-@input_error
+@base_input_validator
 def show_phones(args, book: AddressBook):
     name = args[0]
     phones = book.find(name).phones
     return '; '.join(phone.value for phone in phones)
 
 
-@input_error
+@base_input_validator
 def show_all(book: AddressBook):
     if (len(book) == 0):
         return "No contacts."
@@ -165,21 +220,25 @@ def show_all(book: AddressBook):
         return '\n'.join(str(record) for record in book.values())
 
 
-@input_error
-def birthdays(book: AddressBook):
-    # TODO add parameter with days length
+@birthdays_input_validator
+@base_input_validator
+def birthdays(args, book: AddressBook):
     if (len(book) == 0):
         return "No contacts."
     else:
-        return book.get_birthdays_per_week()
+        # one week by default
+        days_count = 7
+        if (len(args) > 0):
+            days_count = int(args[0])
+        return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 
-@note_error
+@base_input_validator
 def add_note(args, book: NotesBook):
     title = " ".join(args)
     description = input("Введіть опис нотатки: ")
     tags_input = input("Введіть теги нотатки через кому : ")
-    
+
     cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
 
     note = Note(title)
@@ -188,8 +247,7 @@ def add_note(args, book: NotesBook):
     book.add_note(note)
     return f"Нотатка '{title}' створена."
 
-
-@note_error
+@base_input_validator
 def delete_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
@@ -200,11 +258,11 @@ def delete_note(args, book: NotesBook):
         return f"Нотатка '{title}' не знайдена."
 
 
-@note_error
+@base_input_validator
 def change_note(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
-    
+
     if note is not None:
         new_description = input("Введіть опис нотатки: ")
         if new_description.strip() == "":
@@ -216,8 +274,12 @@ def change_note(args, book: NotesBook):
         else:
             new_tags = new_tags_input.split(r',\s*')
 
+@base_input_validator
+def show_all_notes(args, book: NotesBook):
+    # TODO
+    return 'All notes'
         book.edite_note(note, description=new_description, tags=new_tags)
-        return f"Нотатка '{title}' змінена." 
+        return f"Нотатка '{title}' змінена."
     else:
         return f"Нотатка '{title}' не знайдена."
 
@@ -282,9 +344,6 @@ def save_to_file(address_book, notes_book):
     with open('notes_book.pkl', 'wb') as f:
         pickle.dump(notes_book, f)
 
-def find_contacts(arg: str, book: AddressBook)-> list:
-    pass
-
 
 # TODO
 def print_all_commands():
@@ -296,10 +355,8 @@ def handle_command(command, args, address_book, notes_book):
         print("How can I help you?")
     elif command == "add":
         print(add_contact(args, address_book))
-    elif command == "delete":
+    elif command == "delete-contact":
         print(delete_contact(args, address_book))
-    elif command == "find-contact":
-        print(find_contacts(args, address_book))
     elif command == "change-phone":
         print(change_phone(args, address_book))
     elif command == "add-birthday":
@@ -312,10 +369,8 @@ def handle_command(command, args, address_book, notes_book):
         print(show_email(args, address_book))
     elif command == "change-email":
         print(change_email(args, address_book))
-    elif command == "add-address":
+    elif command in ["add-address", "change-address"]:
         print(add_address(args, address_book))
-    elif command == "change-address":
-        print(change_address(args, address_book))
     elif command == "show-address":
         print(show_address(args, address_book))
     elif command == "phone":
@@ -323,7 +378,7 @@ def handle_command(command, args, address_book, notes_book):
     elif command == "all":
         print(show_all(address_book))
     elif command == "birthdays":
-        print(birthdays(address_book))
+        print(birthdays(args, address_book))
     elif command == "add-note":
         print(add_note(args, notes_book))
     elif command == "change-note":

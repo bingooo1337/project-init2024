@@ -19,15 +19,19 @@ class Name(Field):
 class InvalidPhoneException(Exception):
     pass
 
+
 class InvalidEmailException(Exception):
     pass
+
 
 def phone_validator(func):
     def inner(*args, **kwargs):
         if (len(args[1]) != 10):
             raise InvalidPhoneException
         return func(*args, **kwargs)
+
     return inner
+
 
 def email_validator(func):
     def inner(*args, **kwargs):
@@ -36,7 +40,9 @@ def email_validator(func):
         if not re.fullmatch(regex, email):
             raise InvalidEmailException
         return func(*args, **kwargs)
+
     return inner
+
 
 class Phone(Field):
     @phone_validator
@@ -48,6 +54,12 @@ class Email(Field):
     @email_validator
     def __init__(self, value):
         super().__init__(value)
+
+
+class Address(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
 
 class InvalidBirthDateFormatException(Exception):
     pass
@@ -64,6 +76,7 @@ def birthday_validator(func):
         except ValueError:
             raise InvalidBirthDateFormatException
         return func(*updated_args, **kwargs)
+
     return inner
 
 
@@ -85,9 +98,6 @@ class Record:
         self.birthday = None
         self.emails = []
         self.address = None
-
-    def add_address(self, address: str):
-        self.address = address
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -130,10 +140,17 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+    def add_address(self, address):
+        self.address = Address(address)
+
     def __str__(self):
-        res = f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}"
-        if (self.birthday != None):
-            res += f", birthday: {self.birthday}"
+        res = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        if (self.birthday is not None):
+            res += f"; birthday: {self.birthday}"
+        if (len(self.emails) > 0):
+            res += f"; email(s): {', '.join(e.value for e in self.emails)}"
+        if (self.address is not None):
+            res += f"; address: {self.address}"
         return res
 
 
@@ -142,14 +159,15 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def find(self, name):
-        return self.data.get(name, None)
+        return self.data[name]
 
     def delete(self, name):
         del self.data[name]
 
-    def get_birthdays_per_week(self):
+    def get_birthdays_per_week(self, days_count: int):
         users_to_congratulate_by_days = self._get_users_to_congratulate(
-            self.data.values()
+            self.data.values(),
+            days_count
         )
 
         lines = []
@@ -158,13 +176,13 @@ class AddressBook(UserDict):
 
         return '\n'.join(lines)
 
-    def _get_users_to_congratulate(self, users: list[Record]):
+    def _get_users_to_congratulate(self, users: list[Record], days_count: int):
         start = datetime.now().date()
-        end = (start + timedelta(days=6))
+        end = (start + timedelta(days=days_count - 1))
 
         users_to_congratulate = defaultdict(list)
         for user in users:
-            if (user.birthday == None):
+            if (user.birthday is None):
                 continue
 
             congratulation_day = self._get_congratulation_day(
@@ -188,12 +206,5 @@ class AddressBook(UserDict):
         if (birthday_this_year < today):
             congratulation_day = birthday_this_year.replace(
                 year=today.year + 1)
-
-        weekday = congratulation_day.weekday()
-        # 4 - Friday index
-        if (weekday > 4):
-            # birthday is on weekend, congratulation on next work day
-            congratulation_day = congratulation_day + \
-                timedelta(days=7 - weekday)
 
         return congratulation_day
