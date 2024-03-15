@@ -74,6 +74,16 @@ def birthdays_input_validator(func):
     return inner
 
 
+def add_email_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and email."
+
+    return inner
+
+
 def add_address_validator(func):
     def inner(*args, **kwargs):
         try:
@@ -136,6 +146,7 @@ def show_birthday(args, book: AddressBook):
     return str(birthday) if birthday is not None else "No birthday info."
 
 
+@add_email_validator
 @base_input_validator
 def add_email(args, book: AddressBook):
     name, email = args
@@ -158,7 +169,7 @@ def change_email(args, book: AddressBook):
 def show_email(args, book: AddressBook):
     name = args[0]
     emails = book.find(name).emails
-    return '; '.join(email.value for email in emails)
+    return '; '.join(email.value for email in emails) if len(emails) > 0 else "No email."
 
 
 @add_address_validator
