@@ -19,15 +19,19 @@ class Name(Field):
 class InvalidPhoneException(Exception):
     pass
 
+
 class InvalidEmailException(Exception):
     pass
+
 
 def phone_validator(func):
     def inner(*args, **kwargs):
         if (len(args[1]) != 10):
             raise InvalidPhoneException
         return func(*args, **kwargs)
+
     return inner
+
 
 def email_validator(func):
     def inner(*args, **kwargs):
@@ -36,7 +40,9 @@ def email_validator(func):
         if not re.fullmatch(regex, email):
             raise InvalidEmailException
         return func(*args, **kwargs)
+
     return inner
+
 
 class Phone(Field):
     @phone_validator
@@ -48,6 +54,12 @@ class Email(Field):
     @email_validator
     def __init__(self, value):
         super().__init__(value)
+
+
+class Address(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
 
 class InvalidBirthDateFormatException(Exception):
     pass
@@ -64,6 +76,7 @@ def birthday_validator(func):
         except ValueError:
             raise InvalidBirthDateFormatException
         return func(*updated_args, **kwargs)
+
     return inner
 
 
@@ -84,6 +97,7 @@ class Record:
         self.phones = []
         self.birthday = None
         self.emails = []
+        self.address = None
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -126,10 +140,17 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+    def add_address(self, address):
+        self.address = Address(address)
+
     def __str__(self):
-        res = f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}"
-        if (self.birthday != None):
-            res += f", birthday: {self.birthday}"
+        res = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        if (self.birthday is not None):
+            res += f"; birthday: {self.birthday}"
+        if (len(self.emails) > 0):
+            res += f"; email(s): {', '.join(e.value for e in self.emails)}"
+        if (self.address is not None):
+            res += f"; address: {self.address}"
         return res
 
 
@@ -138,7 +159,7 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def find(self, name):
-        return self.data.get(name, None)
+        return self.data[name]
 
     def delete(self, name):
         del self.data[name]
@@ -161,7 +182,7 @@ class AddressBook(UserDict):
 
         users_to_congratulate = defaultdict(list)
         for user in users:
-            if (user.birthday == None):
+            if (user.birthday is None):
                 continue
 
             congratulation_day = self._get_congratulation_day(
@@ -187,3 +208,13 @@ class AddressBook(UserDict):
                 year=today.year + 1)
 
         return congratulation_day
+    
+    def today_birthdays(self):
+        today = datetime.now()
+        birthdays_today = []
+
+        for name in self:
+            record = self.find(name)
+            if record.birthday is not None and record.birthday.value.day == today.day and record.birthday.value.month == today.month:
+                birthdays_today.append(name)
+        return birthdays_today

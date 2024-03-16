@@ -32,8 +32,10 @@ note_1.add_tags("організм", "вода")
 notesBook.print_notes([note_1])
 
 print("delete_tags:")
-note_1.delete_tags("організм", "вода")
+# note_1.delete_tags("організм", "вода")
+note_1.delete_tags(["організм", "вода"])
 notesBook.print_notes([note_1])
+
 
 print("find_note_by_title:")
 print(notesBook.find_note_by_title("Важливість води для організму"))
