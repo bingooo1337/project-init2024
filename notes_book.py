@@ -61,7 +61,7 @@ class NotesBook(UserDict):
     def add_note(self, note: Note):
         self.data[note.title.value] = note
 
-    def edite_note(self, old_note: Note, title = None, description = None, tags = None) -> Note:
+    def edit_note(self, old_note: Note, title=None, description=None, tags=None) -> Note:
         if old_note.title.value in self.data:
             if title is not None:
                 old_note.title.value = title
