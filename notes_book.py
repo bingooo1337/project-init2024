@@ -71,13 +71,13 @@ class NotesBook(UserDict):
                 old_note.tags = tags
             return old_note
         else:
-            raise KeyError(f"Note with title '{old_note.title.value}' has not found.")
+            raise KeyError(f"Note with title '{old_note.title.value}' has not been found.")
 
     def delete_note(self, note: Note):
         if note.title.value in self.data:
             del self.data[note.title.value]
         else:
-            raise KeyError(f"Note '{note.title.value}' has not found.")
+            raise KeyError(f"Note '{note.title.value}' has not been found.")
 
     def get_all_notes(self) -> list:
         return list(self.data.values())
