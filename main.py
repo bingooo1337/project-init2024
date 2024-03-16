@@ -351,7 +351,7 @@ def print_all_commands():
     print("- add-birthday [name] [birthdate]:                   |          Add the birthdate for the specified contact.")
     print("- add [name] [phone]:                                |          Add a new contact with name and phone number.")
     print("- add-email [name] [email]:                          |          Add an email to the specified contact.")
-    print("- add-note [title]...[add description]...[add tags]: |          Add a title, then add a description and tags using the prompt in the terminal.")
+    print("- add-note [title]...[add description]...[add tags]: |          Add a title, then add a description and tags using the terminal prompt.")
     print("- add-tags [title] ... [tags]:                       |          Add tags to a note using the terminal prompt.")
     print("- all:                                               |          Show all contacts in the address book.")
     print("- all-notes:                                         |          Show all notes.")
