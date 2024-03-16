@@ -92,8 +92,18 @@ def add_email_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and email."
+            return "Give me name and email please."
 
+    return inner
+
+
+def change_email_validator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name, old email and new email please."
+    
     return inner
 
 
@@ -133,14 +143,14 @@ def add_contact(args, book: AddressBook):
 
     new_record.add_phone(phone)
     book.add_record(new_record)
-    return "Contact added."
+    return "Contact has been added."
 
 
 @base_input_validator
 def delete_contact(args, book: AddressBook):
     name = args[0]
     book.delete(name)
-    return "Contact deleted."
+    return "Contact has been deleted."
 
 
 @change_phone_validator
@@ -151,7 +161,7 @@ def change_phone(args, book: AddressBook):
     if record.find_phone(old_phone) is None:
         return "No such phone."
     record.edit_phone(old_phone, new_phone)
-    return "Contact updated."
+    return "Phone has been changed."
 
 
 @add_birthday_validator
@@ -159,7 +169,7 @@ def change_phone(args, book: AddressBook):
 def add_birthday(args, book: AddressBook):
     name, birthday = args
     book.find(name).add_birthday(birthday)
-    return "Birthday added."
+    return "Birthday has been added."
 
 
 @base_input_validator
@@ -177,7 +187,7 @@ def add_email(args, book: AddressBook):
     return "Email has been added."
 
 
-@change_phone_validator
+@change_email_validator
 @base_input_validator
 def change_email(args, book: AddressBook):
     name, old_email, new_email = args
@@ -206,7 +216,7 @@ def add_address(args, book: AddressBook):
     address = ' '.join(address_parts)
     record.add_address(address)
 
-    return "Address changed." if had_address else "Address added."
+    return "Address has been changed." if had_address else "Address has been added."
 
 
 @base_input_validator
@@ -214,7 +224,7 @@ def show_address(args, book: AddressBook):
     name = args[0]
     record = book.find(name)
     address = record.address
-    return str(address) if address is not None else "No address."
+    return str(address) if address is not None else "No address found."
 
 
 @base_input_validator
@@ -259,8 +269,8 @@ def birthdays(args, book: AddressBook):
 @note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
-    description = input("Enter note description: ")
-    tags_input = input("Enter note tags separated by commas: ")
+    description = input("Enter note description please: ")
+    tags_input = input("Enter note tags separated by commas please: ")
 
     cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
 
@@ -268,7 +278,7 @@ def add_note(args, book: NotesBook):
     note.description = description
     note.tags = cleaned_tags
     book.add_note(note)
-    return f"Note '{title}' is created."
+    return f"Note '{title}' has been added."
 
 
 @note_error
@@ -277,9 +287,9 @@ def delete_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         book.delete_note(note)
-        return f"Note '{title}' is successfully deleted."
+        return f"Note '{title}' has been successfully deleted."
     else:
-        return f"Note '{title}' is not found."
+        return f"Note '{title}' has not been found."
 
 
 @note_error
@@ -288,17 +298,17 @@ def change_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
 
     if note is not None:
-        new_description = input("Enter note description: ")
+        new_description = input("Enter note description please: ")
         if new_description.strip() == "":
             new_description = note.description.value
 
-        new_tags_input = input("Enter note tags separated by commas: ")
+        new_tags_input = input("Enter note tags separated by commas please: ")
         if new_tags_input.strip() == "":
             new_tags = note.tags
         else:
             new_tags = new_tags_input.split(',')
         book.edit_note(note, title=None, description=new_description, tags=new_tags)
-    return f"Note '{note.title}' is successfully changed."
+    return f"Note '{note.title}' has been successfully changed."
 
 
 @note_error
@@ -313,7 +323,7 @@ def show_note(args, book: NotesBook):
     if (note is not None):
         return note
     else:
-        return f"Note '{title}' is not found."
+        return f"Note '{title}' has not been found."
 
 
 @note_error
@@ -321,12 +331,12 @@ def add_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags separated by commas: ").split(',')
+        tags = input("Enter note tags separated by commas please: ").split(',')
         cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
         note.add_tags(cleaned_tags)
-        return f"Tags {cleaned_tags} of note '{title}' are added."
+        return f"Tags {cleaned_tags} of note '{title}' have been added."
     else:
-        return f"Note '{title}' is not found."
+        return f"Note '{title}' has not been found."
 
 
 @note_error
@@ -334,13 +344,13 @@ def delete_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags for deleting separated by commas: ").split(',')
+        tags = input("Enter note tags for deleting separated by commas please: ").split(',')
         cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
 
         note.delete_tags(cleaned_tags)
-        return f"Tags {tags} from note '{title}' are deleted."
+        return f"Tags {tags} from note '{title}' have been deleted."
     else:
-        return f"Note '{title}' is not found."
+        return f"Note '{title}' has not been found."
 
 
 @note_error
@@ -350,7 +360,7 @@ def search_tags(args, book: NotesBook):
     if (notes is not None):
         book.print_notes(notes)
     else:
-        print(f"No notes with tags '{tags}' found.")
+        print(f"No notes with tags '{tags}' have been found.")
 
 
 def load_from_file():
