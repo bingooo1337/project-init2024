@@ -259,7 +259,7 @@ def get_unique_cleaned_non_empty_tags(input_tags: str):
     cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
     return list(set(cleaned_tags))
 
-def get_note_description(msg):
+def get_note_property(msg):
     while True:
         input_value = input(msg)
         if input_value.strip() == 'exit':
@@ -272,8 +272,12 @@ def get_note_description(msg):
 @note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
+    if (title == ''):
+        title = get_note_property("Enter note title: ")
+    if (title == ''):
+        return f"Note is not created."  
 
-    description = get_note_description("Enter note description: ")
+    description = get_note_property("Enter note description: ")
 
     input_tags = input("Enter note tags separated by commas: ")
 
