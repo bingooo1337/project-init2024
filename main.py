@@ -337,10 +337,13 @@ def add_tags(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         tags = input("Enter note tags separated by commas: ")
-        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)     
         
         note.add_tags(set(cleaned_tags))
-        return f"Tags {cleaned_tags} of note '{title}' are added."
+        msg = f"Tags {cleaned_tags} of note '{title}' are added."
+        if (len(cleaned_tags) == 1 and cleaned_tags[0] == ''):
+            msg = "Tags can't be empty."
+        return msg
     else:
         return f"Note '{title}' is not found."
 
