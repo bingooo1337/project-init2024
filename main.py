@@ -2,7 +2,10 @@ import pickle
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
     Record, InvalidEmailException
 from notes_book import NotesBook, Note
-
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import print_formatted_text, HTML
+from prompt_toolkit.formatted_text import FormattedText
 
 def parse_input(user_input):
     if len(user_input) > 0:
@@ -391,6 +394,8 @@ def save_to_file(address_book, notes_book):
     with open('notes_book.pkl', 'wb') as f:
         pickle.dump(notes_book, f)
 
+command_list = []
+
 
 def print_all_commands():
     print("Command list:")
@@ -482,8 +487,15 @@ def main():
         names = ", ".join(birthdays_today)
         print(f"Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
     print_all_commands()
+
+    command_list = WordCompleter([
+    'add-address', 'add-birthday', 'add', 'add-email', 'add-note', 'add-tags', 'all', 'all-notes', 
+    'birthdays', 'close', 'exit', 'change-address', 'change-email', 'change-phone', 'change-note', 
+    'delete-contact', 'delete-note', 'delete-tags', 'find-contact', 'hello', 'phone', 'search-tag', 
+    'show-address', 'show-birthday', 'show-email', 'show-note'])
+
     while True:
-        user_input = input("Enter a command: ")
+        user_input = prompt('Enter a command: ', completer=command_list)
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
