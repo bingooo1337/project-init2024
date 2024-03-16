@@ -34,13 +34,13 @@ class Note:
 
     @property
     def tags(self):
-        return self._tags
+        return self._unique_non_empty_tags(self._tags)
 
     @tags.setter
     def tags(self, value: list):
-        self._tags = value
+        self._tags = self._unique_non_empty_tags(value)
 
-    def add_tags(self, tags: str):
+    def add_tags(self, tags: list):
         for tag in tags:
             self._tags.append(tag)
 
@@ -50,6 +50,10 @@ class Note:
                 self._tags.remove(tag)
             else:
                 raise ValueError(f"Tag '{tag}' is not found.")
+            
+    def _unique_non_empty_tags(self, tags: list) -> list:
+        non_empty_tags = [tag for tag in tags if tag != '']
+        return list(set(non_empty_tags))
         
     def __repr__(self):
         head = "#========================\n"

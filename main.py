@@ -255,14 +255,29 @@ def birthdays(args, book: AddressBook):
             days_count = int(args[0])
         return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
+def get_unique_cleaned_non_empty_tags(input_tags: str):
+    cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
+    return list(set(cleaned_tags))
+
+def get_note_description(msg):
+    while True:
+        input_value = input(msg)
+        if input_value.strip() == 'exit':
+            break
+        elif input_value.strip() == '':
+            print("Value cannot be empty.")
+        else:
+            return input_value
 
 @note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
-    description = input("Enter note description: ")
-    tags_input = input("Enter note tags separated by commas: ")
 
-    cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
+    description = get_note_description("Enter note description: ")
+
+    input_tags = input("Enter note tags separated by commas: ")
+
+    cleaned_tags = get_unique_cleaned_non_empty_tags(input_tags)
 
     note = Note(title)
     note.description = description
@@ -296,7 +311,7 @@ def change_note(args, book: NotesBook):
         if new_tags_input.strip() == "":
             new_tags = note.tags
         else:
-            new_tags = new_tags_input.split(',')
+            new_tags = get_unique_cleaned_non_empty_tags(new_tags_input)
         book.edit_note(note, title=None, description=new_description, tags=new_tags)
     return f"Note '{note.title}' is successfully changed."
 
@@ -321,9 +336,10 @@ def add_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags separated by commas: ").split(',')
-        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
-        note.add_tags(cleaned_tags)
+        tags = input("Enter note tags separated by commas: ")
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
+        
+        note.add_tags(set(cleaned_tags))
         return f"Tags {cleaned_tags} of note '{title}' are added."
     else:
         return f"Note '{title}' is not found."
@@ -334,8 +350,8 @@ def delete_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags for deleting separated by commas: ").split(',')
-        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+        tags = input("Enter note tags for deleting separated by commas: ")
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
 
         note.delete_tags(cleaned_tags)
         return f"Tags {tags} from note '{title}' are deleted."
@@ -457,7 +473,7 @@ def handle_command(command, args, address_book, notes_book):
 def main():
     address_book, notes_book = load_from_file()
 
-    print("Welcome to the assistant bot!")
+    print("Welcome to the assistant bot!\n")
     birthdays_today = address_book.today_birthdays()
     if birthdays_today:
         names = ", ".join(birthdays_today)
