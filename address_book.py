@@ -1,7 +1,9 @@
 from collections import UserDict, defaultdict
 from datetime import datetime, timedelta
 import re
+from colorama import init, Fore
 
+init()
 
 class Field:
     def __init__(self, value):
@@ -88,7 +90,7 @@ class Birthday(Field):
         super().__init__(value)
 
     def __str__(self):
-        return self.value.strftime(Birthday.date_format)
+        return f"{Fore.YELLOW}{self.value.strftime(Birthday.date_format)}"
 
 
 class Record:
@@ -144,7 +146,7 @@ class Record:
         self.address = Address(address)
 
     def __str__(self):
-        res = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        res = f"{Fore.YELLOW}Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
         if (self.birthday is not None):
             res += f"; birthday: {self.birthday}"
         if (len(self.emails) > 0):
@@ -163,6 +165,23 @@ class AddressBook(UserDict):
 
     def delete(self, name):
         del self.data[name]
+
+    def search_contacts(self, search_word):
+        word = search_word.lower()
+        results = []
+        for record in self.values():
+            # combine all info into one searchable line
+            record_info = ' '.join([
+                record.name.value,
+                ' '.join(e.value for e in record.phones),
+                ' '.join(e.value for e in record.emails),
+                str(record.birthday) if record.birthday is not None else '',
+                record.address.value if record.address is not None else '',
+            ]).lower()
+
+            if word in record_info:
+                results.append(record)
+        return results
 
     def get_birthdays_per_week(self, days_count: int):
         users_to_congratulate_by_days = self._get_users_to_congratulate(
