@@ -2,7 +2,13 @@ import pickle
 from address_book import AddressBook, InvalidBirthDateFormatException, InvalidPhoneException, \
     Record, InvalidEmailException
 from notes_book import NotesBook, Note
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import print_formatted_text, HTML
+from prompt_toolkit.formatted_text import FormattedText
+from colorama import init, Fore
 
+init()
 
 def parse_input(user_input):
     if len(user_input) > 0:
@@ -28,15 +34,15 @@ def base_input_validator(func):
         try:
             return func(*args, **kwargs)
         except KeyError:
-            return "No such contact."
+            return f"{Fore.RED}No such contact."
         except IndexError:
-            return "Give me name please."
+            return f"{Fore.BLUE}Give me name please."
         except InvalidPhoneException:
-            return "Phone number length should be 10."
+            return f"{Fore.RED}Phone number length should be 10."
         except InvalidEmailException:
-            return "Please provide a valid email."
+            return f"{Fore.RED}Please provide a valid email."
         except InvalidBirthDateFormatException:
-            return "Birthday should have format DD.MM.YYYY."
+            return f"{Fore.RED}Birthday should have format DD.MM.YYYY."
 
     return inner
 
@@ -46,7 +52,7 @@ def add_contact_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and phone please."
+            return f"{Fore.BLUE}Give me name and phone please."
 
     return inner
 
@@ -56,7 +62,7 @@ def change_phone_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name, old phone and new phone please."
+            return f"{Fore.BLUE}Give me name, old phone and new phone please."
 
     return inner
 
@@ -66,7 +72,7 @@ def add_birthday_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and birthday please."
+            return f"{Fore.BLUE}Give me name and birthday please."
 
     return inner
 
@@ -78,11 +84,11 @@ def birthdays_input_validator(func):
             if (len(params) > 0):
                 days_count = int(params[0])
                 if (days_count < 1):
-                    return "Give me the number of days > 0"
+                    return f"{Fore.BLUE}Give me the number of days > 0"
 
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me the number of days > 0"
+            return f"{Fore.BLUE}Give me the number of days > 0"
 
     return inner
 
@@ -92,7 +98,7 @@ def add_email_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and email please."
+            return f"{Fore.BLUE}Give me name and email please."
 
     return inner
 
@@ -102,7 +108,7 @@ def change_email_validator(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name, old email and new email please."
+            return f"{Fore.BLUE}Give me name, old email and new email please."
 
     return inner
 
@@ -116,7 +122,7 @@ def add_address_validator(func):
                 raise ValueError
             return func(*args, **kwargs)
         except ValueError:
-            return "Give me name and address please."
+            return f"{Fore.BLUE}Give me name and address please."
 
     return inner
 
@@ -126,7 +132,7 @@ def find_contact_validator(func):
         try:
             return func(*args, **kwargs)
         except IndexError:
-            return "Give me search word please."
+            return f"{Fore.BLUE}Give me search word please."
 
     return inner
 
@@ -143,14 +149,14 @@ def add_contact(args, book: AddressBook):
 
     new_record.add_phone(phone)
     book.add_record(new_record)
-    return "Contact has been added."
+    return f"{Fore.GREEN}Contact has been added."
 
 
 @base_input_validator
 def delete_contact(args, book: AddressBook):
     name = args[0]
     book.delete(name)
-    return "Contact has been deleted."
+    return f"{Fore.GREEN}Contact has been deleted."
 
 
 @change_phone_validator
@@ -159,9 +165,9 @@ def change_phone(args, book: AddressBook):
     name, old_phone, new_phone = args
     record = book.find(name)
     if record.find_phone(old_phone) is None:
-        return "No such phone."
+        return f"{Fore.RED}No such phone."
     record.edit_phone(old_phone, new_phone)
-    return "Phone has been changed."
+    return f"{Fore.GREEN}Phone has been changed."
 
 
 @add_birthday_validator
@@ -169,14 +175,14 @@ def change_phone(args, book: AddressBook):
 def add_birthday(args, book: AddressBook):
     name, birthday = args
     book.find(name).add_birthday(birthday)
-    return "Birthday has been added."
+    return f"{Fore.GREEN}Birthday has been added."
 
 
 @base_input_validator
 def show_birthday(args, book: AddressBook):
     name = args[0]
     birthday = book.find(name).birthday
-    return str(birthday) if birthday is not None else "No birthday info."
+    return f"{Fore.YELLOW}{str(birthday)}" if birthday is not None else f"{Fore.RED}No birthday info."
 
 
 @add_email_validator
@@ -184,7 +190,7 @@ def show_birthday(args, book: AddressBook):
 def add_email(args, book: AddressBook):
     name, email = args
     book.find(name).add_email(email)
-    return "Email has been added."
+    return f"{Fore.GREEN}Email has been added."
 
 
 @change_email_validator
@@ -193,16 +199,16 @@ def change_email(args, book: AddressBook):
     name, old_email, new_email = args
     record = book.find(name)
     if (record.find_email(old_email) is None):
-        return "No such email."
+        return f"{Fore.RED}No such email."
     record.change_email(old_email, new_email)
-    return "Email has been changed."
+    return f"{Fore.GREEN}Email has been changed."
 
 
 @base_input_validator
 def show_email(args, book: AddressBook):
     name = args[0]
     emails = book.find(name).emails
-    return '; '.join(email.value for email in emails) if len(emails) > 0 else "No email."
+    return f"{Fore.YELLOW}{'; '.join(email.value for email in emails)}" if len(emails) > 0 else f"{Fore.RED}No email."
 
 
 @add_address_validator
@@ -216,7 +222,7 @@ def add_address(args, book: AddressBook):
     address = ' '.join(address_parts)
     record.add_address(address)
 
-    return "Address has been changed." if had_address else "Address has been added."
+    return f"{Fore.GREEN}Address has been changed." if had_address else f"{Fore.GREEN}Address has been added."
 
 
 @base_input_validator
@@ -224,14 +230,14 @@ def show_address(args, book: AddressBook):
     name = args[0]
     record = book.find(name)
     address = record.address
-    return str(address) if address is not None else "No address found."
+    return f"{Fore.YELLOW}{str(address)}" if address is not None else f"{Fore.RED}No address found."
 
 
 @base_input_validator
 def show_phones(args, book: AddressBook):
     name = args[0]
     phones = book.find(name).phones
-    return '; '.join(phone.value for phone in phones)
+    return f"{Fore.YELLOW}{'; '.join(phone.value for phone in phones)}"
 
 
 @find_contact_validator
@@ -242,7 +248,7 @@ def find_contact(args, book: AddressBook):
     if not result:
         return "No result."
     else:
-        return '\n'.join(str(record) for record in result)
+        return '\n'.join(f"{Fore.YELLOW}{str(record)}" for record in result)
 
 
 @base_input_validator
@@ -250,20 +256,20 @@ def show_all(book: AddressBook):
     if (len(book) == 0):
         return "No contacts."
     else:
-        return '\n'.join(str(record) for record in book.values())
+        return '\n'.join(f"{Fore.YELLOW}{str(record)}" for record in book.values())
 
 
 @birthdays_input_validator
 @base_input_validator
 def birthdays(args, book: AddressBook):
     if (len(book) == 0):
-        return "No contacts."
+        return f"{Fore.RED}No contacts."
     else:
         # one week by default
         days_count = 7
         if (len(args) > 0):
             days_count = int(args[0])
-        return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
+        return f"{Fore.YELLOW}Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 def get_unique_cleaned_non_empty_tags(input_tags: str):
     cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
@@ -271,11 +277,11 @@ def get_unique_cleaned_non_empty_tags(input_tags: str):
 
 def get_note_property(msg):
     while True:
-        input_value = input(msg)
+        input_value = input(f"{Fore.BLUE}{msg}")
         if input_value.strip() == 'exit':
             break
         elif input_value.strip() == '':
-            print("Value cannot be empty.")
+            print(f"{Fore.RED}Value cannot be empty.")
         else:
             return input_value
 
@@ -285,11 +291,11 @@ def add_note(args, book: NotesBook):
     if (title == ''):
         title = get_note_property("Enter note title: ")
     if (title == ''):
-        return f"Note is not created."
+        return f"{Fore.RED}Note is not created."
 
     description = get_note_property("Enter note description: ")
 
-    input_tags = input("Enter note tags separated by commas: ")
+    input_tags = input(f"{Fore.BLUE}Enter note tags separated by commas: ")
 
     cleaned_tags = get_unique_cleaned_non_empty_tags(input_tags)
 
@@ -297,7 +303,7 @@ def add_note(args, book: NotesBook):
     note.description = description
     note.tags = cleaned_tags
     book.add_note(note)
-    return f"Note '{title}' has been added."
+    return f"{Fore.GREEN}Note '{title}' has been added."
 
 
 @note_error
@@ -306,9 +312,9 @@ def delete_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         book.delete_note(note)
-        return f"Note '{title}' has been successfully deleted."
+        return f"{Fore.GREEN}Note '{title}' has been successfully deleted."
     else:
-        return f"Note '{title}' has not been found."
+        return f"{Fore.RED}Note '{title}' has not been found."
 
 
 @note_error
@@ -317,17 +323,17 @@ def change_note(args, book: NotesBook):
     note = book.find_note_by_title(title)
 
     if note is not None:
-        new_description = input("Enter note description please: ")
+        new_description = input(f"{Fore.BLUE}Enter note description please: ")
         if new_description.strip() == "":
             new_description = note.description.value
 
-        new_tags_input = input("Enter note tags separated by commas please: ")
+        new_tags_input = input(f"{Fore.BLUE}Enter note tags separated by commas please: ")
         if new_tags_input.strip() == "":
             new_tags = note.tags
         else:
             new_tags = get_unique_cleaned_non_empty_tags(new_tags_input)
         book.edit_note(note, title=None, description=new_description, tags=new_tags)
-    return f"Note '{note.title}' has been successfully changed."
+    return f"{Fore.GREEN}Note '{note.title}' has been successfully changed."
 
 
 @note_error
@@ -342,7 +348,7 @@ def show_note(args, book: NotesBook):
     if (note is not None):
         return note
     else:
-        return f"Note '{title}' has not been found."
+        return f"{Fore.RED}Note '{title}' has not been found."
 
 
 @note_error
@@ -350,16 +356,16 @@ def add_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags separated by commas: ")
+        tags = input(f"{Fore.BLUE}Enter note tags separated by commas pleas: ")
         cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
 
         note.add_tags(set(cleaned_tags))
-        msg = f"Tags {cleaned_tags} of note '{title}' are added."
+        msg = f"{Fore.GREEN}Tags {cleaned_tags} of note '{title}' have been added."
         if (len(cleaned_tags) == 1 and cleaned_tags[0] == ''):
-            msg = "Tags can't be empty."
+            msg = f"{Fore.RED}Tags can't be empty."
         return msg
     else:
-        return f"Note '{title}' has not been found."
+        return f"{Fore.RED}Note '{title}' has not been not found."
 
 
 @note_error
@@ -367,13 +373,13 @@ def delete_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags for deleting separated by commas pleas: ")
+        tags = input(f"{Fore.BLUE}Enter note tags for deleting separated by commas pleas: ")
         cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
 
         note.delete_tags(cleaned_tags)
-        return f"Tags {tags} from note '{title}' have been deleted."
+        return f"{Fore.GREEN}Tags {tags} from note '{title}' have been deleted."
     else:
-        return f"Note '{title}' has not been found."
+        return f"{Fore.RED}Note '{title}' has not been not found."
 
 
 @note_error
@@ -383,7 +389,7 @@ def search_tags(args, book: NotesBook):
     if (notes is not None):
         book.print_notes(notes)
     else:
-        print(f"No notes with tags '{tags}' have been found.")
+        print(f"{Fore.RED}No notes with tags '{tags}' have been found.")
 
 
 def load_from_file():
@@ -408,37 +414,37 @@ def save_to_file(address_book, notes_book):
 
 def print_all_commands():
     print("Command list:")
-    print("- add-address [name] [address]:                      |          Add an address, str. etc")
-    print("- add-birthday [name] [birthdate]:                   |          Add the birthdate for the specified contact.")
-    print("- add [name] [phone]:                                |          Add a new contact with name and phone number.")
-    print("- add-email [name] [email]:                          |          Add an email to the specified contact.")
-    print("- add-note [title] [text]:                           |          Add a note.")
-    print("- add-tags [title][tag]...[tag]:                     |          Add a tag(s) to the note.")
-    print("- all:                                               |          Show all contacts in the address book.")
-    print("- all-notes:                                         |          Show all notes.")
-    print("- birthdays:                                         |          Show birthdays that will occur within 7 days.")
-    print("- birthdays [days number]:                           |          Show birthdays that will occur within the specified number of days.")
-    print("- close or exit:                                     |          Close the application.")
-    print("- change-address [name] [address]:                   |          Change the address for the specified contact.")
-    print("- change-email [name] [old email] [new email]:       |          Change the email for the specified contact by adding from the old email to the new one.")
-    print("- change-phone [name] [old phone] [new phone]:       |          Change the phone number for the specified contact, transferring from the old to the new.")
-    print("- change-note [title] [text]:                        |          Change a note.")
-    print("- delete-contact [name]:                             |          Delete the entire contact record.")
-    print("- delete-note [title]:                               |          Delete the note")
-    print("- delete-tags [tag]:                                 |          Delete the tag.")
-    print("- find-contact [param]:                              |          Display all contact records found by the specified parameter.")
-    print("- hello:                                             |          Show text 'How can I help you?'")
-    print("- phone [name]:                                      |          Show the phone number for the specified contact.")
-    print("- search-tag [tag]:                                  |          Show notes by tag.")
-    print("- show-address [name]:                               |          Show the address for the specified contact.")
-    print("- show-birthday [name]:                              |          Show the birthdate for the specified contact.")
-    print("- show-email [name]:                                 |          Show the email for the specified contact.")
-    print("- show-note [title]:                                 |          Show a note.")
+    print(f"{Fore.LIGHTGREEN_EX}- add-address {Fore.LIGHTYELLOW_EX}[name] [address]:                {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add an address, str. etc")
+    print(f"{Fore.LIGHTGREEN_EX}- add-birthday {Fore.LIGHTYELLOW_EX}[name] [birthdate]:             {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add the birthdate for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- add {Fore.LIGHTYELLOW_EX}[name] [phone]:                          {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a new contact with name and phone number.")
+    print(f"{Fore.LIGHTGREEN_EX}- add-email {Fore.LIGHTYELLOW_EX}[name] [email]:                    {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add an email to the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- add-note {Fore.LIGHTYELLOW_EX}[title] [text]:                     {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a note.")
+    print(f"{Fore.LIGHTGREEN_EX}- add-tags {Fore.LIGHTYELLOW_EX}[title][tag]...[tag]:               {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a tag(s) to the note.")
+    print(f"{Fore.LIGHTGREEN_EX}- all:                                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show all contacts in the address book.")
+    print(f"{Fore.LIGHTGREEN_EX}- all-notes:                                   {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show all notes.")
+    print(f"{Fore.LIGHTGREEN_EX}- birthdays:                                   {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show birthdays that will occur within 7 days.")
+    print(f"{Fore.LIGHTGREEN_EX}- birthdays {Fore.LIGHTYELLOW_EX}[days number]:                     {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show birthdays that will occur within the specified number of days.")
+    print(f"{Fore.LIGHTGREEN_EX}- close or exit:                               {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Close the application.")
+    print(f"{Fore.LIGHTGREEN_EX}- change-address {Fore.LIGHTYELLOW_EX}[name] [address]:             {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the address for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- change-email {Fore.LIGHTYELLOW_EX}[name] [old email] [new email]: {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the email for the specified contact by adding from the old email to the new one.")
+    print(f"{Fore.LIGHTGREEN_EX}- change-phone {Fore.LIGHTYELLOW_EX}[name] [old phone] [new phone]: {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the phone number for the specified contact, transferring from the old to the new.")
+    print(f"{Fore.LIGHTGREEN_EX}- change-note {Fore.LIGHTYELLOW_EX}[title] [text]:                  {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change a note.")
+    print(f"{Fore.LIGHTGREEN_EX}- delete-contact {Fore.LIGHTYELLOW_EX}[name]:                       {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the entire contact record.")
+    print(f"{Fore.LIGHTGREEN_EX}- delete-note {Fore.LIGHTYELLOW_EX}[title]:                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the note")
+    print(f"{Fore.LIGHTGREEN_EX}- delete-tags {Fore.LIGHTYELLOW_EX}[tag]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the tag.")
+    print(f"{Fore.LIGHTGREEN_EX}- find-contact {Fore.LIGHTYELLOW_EX}[param]:                        {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Display all contact records found by the specified parameter.")
+    print(f"{Fore.LIGHTGREEN_EX}- hello:                                       {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show text 'How can I help you?'")
+    print(f"{Fore.LIGHTGREEN_EX}- phone {Fore.LIGHTYELLOW_EX}[name]:                                {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the phone number for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- search-tag {Fore.LIGHTYELLOW_EX}[tag]:                            {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show notes by tag.")
+    print(f"{Fore.LIGHTGREEN_EX}- show-address {Fore.LIGHTYELLOW_EX}[name]:                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the address for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- show-birthday {Fore.LIGHTYELLOW_EX}[name]:                        {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the birthdate for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- show-email {Fore.LIGHTYELLOW_EX}[name]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the email for the specified contact.")
+    print(f"{Fore.LIGHTGREEN_EX}- show-note {Fore.LIGHTYELLOW_EX}[title]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show a note.")
     
 
 def handle_command(command, args, address_book, notes_book):
     if command == "hello":
-        print("How can I help you?")
+        print(Fore.BLUE + "How can I help you?")
     elif command == "add":
         print(add_contact(args, address_book))
     elif command == "delete-contact":
@@ -484,7 +490,7 @@ def handle_command(command, args, address_book, notes_book):
     elif command == "all-notes":
         show_all_notes(notes_book)
     else:
-        print("Invalid command.")
+        print(Fore.RED + "Invalid command.")
 
 
 def main():
@@ -496,13 +502,20 @@ def main():
         names = ", ".join(birthdays_today)
         print(f"Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
     print_all_commands()
+
+    command_list = WordCompleter([
+    'add-address', 'add-birthday', 'add', 'add-email', 'add-note', 'add-tags', 'all', 'all-notes',
+    'birthdays', 'close', 'exit', 'change-address', 'change-email', 'change-phone', 'change-note',
+    'delete-contact', 'delete-note', 'delete-tags', 'find-contact', 'hello', 'phone', 'search-tag',
+    'show-address', 'show-birthday', 'show-email', 'show-note'])
+
     while True:
-        user_input = input("Enter a command: ")
+        user_input = prompt('Enter a command: ', completer=command_list)
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
             save_to_file(address_book, notes_book)
-            print("Good bye!")
+            print(Fore.BLUE + "Good bye!")
             break
         else:
             handle_command(command, args, address_book, notes_book)
