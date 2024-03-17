@@ -103,7 +103,7 @@ def change_email_validator(func):
             return func(*args, **kwargs)
         except ValueError:
             return "Give me name, old email and new email please."
-    
+
     return inner
 
 
@@ -265,14 +265,33 @@ def birthdays(args, book: AddressBook):
             days_count = int(args[0])
         return f"Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
+def get_unique_cleaned_non_empty_tags(input_tags: str):
+    cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
+    return list(set(cleaned_tags))
+
+def get_note_property(msg):
+    while True:
+        input_value = input(msg)
+        if input_value.strip() == 'exit':
+            break
+        elif input_value.strip() == '':
+            print("Value cannot be empty.")
+        else:
+            return input_value
 
 @note_error
 def add_note(args, book: NotesBook):
     title = " ".join(args)
-    description = input("Enter note description please: ")
-    tags_input = input("Enter note tags separated by commas please: ")
+    if (title == ''):
+        title = get_note_property("Enter note title: ")
+    if (title == ''):
+        return f"Note is not created."
 
-    cleaned_tags = [tag.strip().strip('\'\"') for tag in tags_input.split(',')]
+    description = get_note_property("Enter note description: ")
+
+    input_tags = input("Enter note tags separated by commas: ")
+
+    cleaned_tags = get_unique_cleaned_non_empty_tags(input_tags)
 
     note = Note(title)
     note.description = description
@@ -306,7 +325,7 @@ def change_note(args, book: NotesBook):
         if new_tags_input.strip() == "":
             new_tags = note.tags
         else:
-            new_tags = new_tags_input.split(',')
+            new_tags = get_unique_cleaned_non_empty_tags(new_tags_input)
         book.edit_note(note, title=None, description=new_description, tags=new_tags)
     return f"Note '{note.title}' has been successfully changed."
 
@@ -331,10 +350,14 @@ def add_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags separated by commas please: ").split(',')
-        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
-        note.add_tags(cleaned_tags)
-        return f"Tags {cleaned_tags} of note '{title}' have been added."
+        tags = input("Enter note tags separated by commas: ")
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
+
+        note.add_tags(set(cleaned_tags))
+        msg = f"Tags {cleaned_tags} of note '{title}' are added."
+        if (len(cleaned_tags) == 1 and cleaned_tags[0] == ''):
+            msg = "Tags can't be empty."
+        return msg
     else:
         return f"Note '{title}' has not been found."
 
@@ -344,8 +367,8 @@ def delete_tags(args, book: NotesBook):
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
-        tags = input("Enter note tags for deleting separated by commas please: ").split(',')
-        cleaned_tags = [tag.strip('\'"').strip() for tag in tags]
+        tags = input("Enter note tags for deleting separated by commas pleas: ")
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
 
         note.delete_tags(cleaned_tags)
         return f"Tags {tags} from note '{title}' have been deleted."
