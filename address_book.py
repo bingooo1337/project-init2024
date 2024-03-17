@@ -1,7 +1,9 @@
 from collections import UserDict, defaultdict
 from datetime import datetime, timedelta
 import re
+from colorama import init, Fore
 
+init()
 
 class Field:
     def __init__(self, value):
@@ -88,7 +90,7 @@ class Birthday(Field):
         super().__init__(value)
 
     def __str__(self):
-        return self.value.strftime(Birthday.date_format)
+        return f"{Fore.YELLOW}{self.value.strftime(Birthday.date_format)}"
 
 
 class Record:
@@ -144,7 +146,7 @@ class Record:
         self.address = Address(address)
 
     def __str__(self):
-        res = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        res = f"{Fore.YELLOW}Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
         if (self.birthday is not None):
             res += f"; birthday: {self.birthday}"
         if (len(self.emails) > 0):

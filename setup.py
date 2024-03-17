@@ -9,6 +9,10 @@ setup(
             'info-cli=main:main',
         ],
     },
+    install_requires=[
+        'colorama==0.4.6',
+        'prompt_toolkit==3.0.43',
+    ],
     author='project-team-14',
     description='Personal assistant for managing contacts and notes',
     license='MIT',
