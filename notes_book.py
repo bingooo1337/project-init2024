@@ -53,7 +53,7 @@ class Note:
                 self._tags.remove(tag)
             else:
                 raise ValueError(f"{Fore.RED}Tag '{tag}' has not been not found.")
-            
+
     def _unique_non_empty_tags(self, tags: list) -> list:
         non_empty_tags = [tag for tag in tags if tag != '']
         return list(set(non_empty_tags))

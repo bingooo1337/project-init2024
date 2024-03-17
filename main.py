@@ -357,8 +357,8 @@ def add_tags(args, book: NotesBook):
     note = book.find_note_by_title(title)
     if (note is not None):
         tags = input(f"{Fore.BLUE}Enter note tags separated by commas pleas: ")
-        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)     
-        
+        cleaned_tags = get_unique_cleaned_non_empty_tags(tags)
+
         note.add_tags(set(cleaned_tags))
         msg = f"{Fore.GREEN}Tags {cleaned_tags} of note '{title}' have been added."
         if (len(cleaned_tags) == 1 and cleaned_tags[0] == ''):
