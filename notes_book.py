@@ -49,8 +49,8 @@ class Note:
             if tag in self._tags:
                 self._tags.remove(tag)
             else:
-                raise ValueError(f"Tag '{tag}' is not found.")
-            
+                raise ValueError(f"Tag '{tag}' has not been found.")
+
     def _unique_non_empty_tags(self, tags: list) -> list:
         non_empty_tags = [tag for tag in tags if tag != '']
         return list(set(non_empty_tags))
@@ -75,13 +75,13 @@ class NotesBook(UserDict):
                 old_note.tags = tags
             return old_note
         else:
-            raise KeyError(f"Note with title '{old_note.title.value}' not found.")
+            raise KeyError(f"Note with title '{old_note.title.value}' has not been found.")
 
     def delete_note(self, note: Note):
         if note.title.value in self.data:
             del self.data[note.title.value]
         else:
-            raise KeyError(f"Note '{note.title.value}' is not found.")
+            raise KeyError(f"Note '{note.title.value}' has not been found.")
 
     def get_all_notes(self) -> list:
         return list(self.data.values())
