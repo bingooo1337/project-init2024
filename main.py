@@ -401,8 +401,6 @@ def save_to_file(address_book, notes_book):
     with open('notes_book.pkl', 'wb') as f:
         pickle.dump(notes_book, f)
 
-command_list = []
-
 
 def print_all_commands():
     print("Command list:")
