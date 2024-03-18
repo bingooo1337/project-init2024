@@ -1,5 +1,5 @@
 from collections import UserDict
-from address_book import Field  # Потрібно імпортувати Field, якщо це модуль або клас
+from address_book import Field  
 from colorama import init, Fore
 
 init()
