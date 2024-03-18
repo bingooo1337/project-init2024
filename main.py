@@ -605,8 +605,9 @@ def change_note(args, book: NotesBook):
         else:
             new_tags = get_unique_cleaned_non_empty_tags(new_tags_input)
         book.edit_note(note, title=None, description=new_description, tags=new_tags)
-    return f"{Fore.GREEN}Note '{note.title}' has been successfully changed."
-
+        return f"{Fore.GREEN}Note '{note.title}' has been successfully changed."
+    else:
+        return f"{Fore.RED}Note with title '{title}' was not found."
 
 @note_error
 def show_all_notes(book: NotesBook):
