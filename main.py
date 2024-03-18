@@ -11,6 +11,15 @@ from colorama import init, Fore
 init()
 
 def parse_input(user_input):
+    """
+    Розбирає введений користувачем рядок і повертає команду та аргументи.
+
+    Args:
+        user_input (str): Рядок введення від користувача.
+
+    Returns:
+        tuple: Кортеж, що містить команду та аргументи.
+    """
     if len(user_input) > 0:
         cmd, *args = user_input.split()
     else:
@@ -20,6 +29,15 @@ def parse_input(user_input):
 
 
 def note_error(func):
+    """
+    Декоратор, який перехоплює винятки ValueError та повертає повідомлення про помилку.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -30,6 +48,15 @@ def note_error(func):
 
 
 def base_input_validator(func):
+    """
+    Декоратор, який перехоплює певні винятки, пов'язані з перевіркою контактів.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -48,6 +75,15 @@ def base_input_validator(func):
 
 
 def add_contact_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані з додаванням контакту.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -58,6 +94,15 @@ def add_contact_validator(func):
 
 
 def change_phone_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані зі зміною номера телефону.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -68,6 +113,15 @@ def change_phone_validator(func):
 
 
 def add_birthday_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані з додаванням дня народження.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -78,6 +132,15 @@ def add_birthday_validator(func):
 
 
 def birthdays_input_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані з введенням кількості днів.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             params = args[0]
@@ -94,6 +157,15 @@ def birthdays_input_validator(func):
 
 
 def add_email_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані з додаванням електронної адреси.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -104,6 +176,15 @@ def add_email_validator(func):
 
 
 def change_email_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані зі зміною електронної адреси.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -114,6 +195,15 @@ def change_email_validator(func):
 
 
 def add_address_validator(func):
+    """
+    Декоратор, який перехоплює винятки ValueError, пов'язані з додаванням адреси.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             # args after name
@@ -128,6 +218,15 @@ def add_address_validator(func):
 
 
 def find_contact_validator(func):
+    """
+    Декоратор, який перехоплює винятки IndexError, пов'язані з пошуком контакту.
+
+    Args:
+        func (callable): Функція для декорування.
+
+    Returns:
+        callable: Декорована функція.
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -140,6 +239,15 @@ def find_contact_validator(func):
 @add_contact_validator
 @base_input_validator
 def add_contact(args, book: AddressBook):
+    """
+    Додає контакт до адресної книги.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я та номер телефону.
+
+    Returns:
+        str: Повідомлення про успішне додавання контакту.
+    """
     name, phone = args
 
     try:
@@ -154,6 +262,15 @@ def add_contact(args, book: AddressBook):
 
 @base_input_validator
 def delete_contact(args, book: AddressBook):
+    """
+    Видаляє контакт з адресної книги.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я контакту.
+
+    Returns:
+        str: Повідомлення про успішне видалення контакту.
+    """
     name = args[0]
     book.delete(name)
     return f"{Fore.GREEN}Contact has been deleted."
@@ -162,6 +279,15 @@ def delete_contact(args, book: AddressBook):
 @change_phone_validator
 @base_input_validator
 def change_phone(args, book: AddressBook):
+    """
+    Змінює номер телефону контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я, старий та новий номер телефону.
+
+    Returns:
+        str: Повідомлення про успішну зміну номера телефону.
+    """
     name, old_phone, new_phone = args
     record = book.find(name)
     if record.find_phone(old_phone) is None:
@@ -173,6 +299,15 @@ def change_phone(args, book: AddressBook):
 @add_birthday_validator
 @base_input_validator
 def add_birthday(args, book: AddressBook):
+    """
+    Додає день народження до контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я та день народження.
+
+    Returns:
+        str: Повідомлення про успішне додавання дня народження.
+    """
     name, birthday = args
     book.find(name).add_birthday(birthday)
     return f"{Fore.GREEN}Birthday has been added."
@@ -180,6 +315,15 @@ def add_birthday(args, book: AddressBook):
 
 @base_input_validator
 def show_birthday(args, book: AddressBook):
+    """
+    Показує день народження контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я контакту.
+
+    Returns:
+        str: День народження або повідомлення про його відсутність.
+    """
     name = args[0]
     birthday = book.find(name).birthday
     return f"{Fore.YELLOW}{str(birthday)}" if birthday is not None else f"{Fore.RED}No birthday info."
@@ -188,6 +332,15 @@ def show_birthday(args, book: AddressBook):
 @add_email_validator
 @base_input_validator
 def add_email(args, book: AddressBook):
+    """
+    Додає електронну адресу до контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я та електронну адресу.
+
+    Returns:
+        str: Повідомлення про успішне додавання електронної адреси.
+    """
     name, email = args
     book.find(name).add_email(email)
     return f"{Fore.GREEN}Email has been added."
@@ -196,6 +349,15 @@ def add_email(args, book: AddressBook):
 @change_email_validator
 @base_input_validator
 def change_email(args, book: AddressBook):
+    """
+    Змінює електронну адресу контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я, стару та нову електронну адресу.
+
+    Returns:
+        str: Повідомлення про успішну зміну елект
+    """
     name, old_email, new_email = args
     record = book.find(name)
     if (record.find_email(old_email) is None):
@@ -206,6 +368,15 @@ def change_email(args, book: AddressBook):
 
 @base_input_validator
 def show_email(args, book: AddressBook):
+    """
+    Показує електронну адресу контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я контакту.
+
+    Returns:
+        str: Електронна адреса або повідомлення про її відсутність.
+    """
     name = args[0]
     emails = book.find(name).emails
     return f"{Fore.YELLOW}{'; '.join(email.value for email in emails)}" if len(emails) > 0 else f"{Fore.RED}No email."
@@ -214,6 +385,15 @@ def show_email(args, book: AddressBook):
 @add_address_validator
 @base_input_validator
 def add_address(args, book: AddressBook):
+    """
+    Додає адресу до контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я та адресу.
+
+    Returns:
+        str: Повідомлення про успішне додавання адреси.
+    """
     name, *address_parts = args
     record = book.find(name)
     had_address = record.address is not None
@@ -227,6 +407,15 @@ def add_address(args, book: AddressBook):
 
 @base_input_validator
 def show_address(args, book: AddressBook):
+    """
+    Показує адресу контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я контакту.
+
+    Returns:
+        str: Адреса або повідомлення про її відсутність.
+    """
     name = args[0]
     record = book.find(name)
     address = record.address
@@ -235,6 +424,15 @@ def show_address(args, book: AddressBook):
 
 @base_input_validator
 def show_phones(args, book: AddressBook):
+    """
+    Показує номери телефонів контакту.
+
+    Args:
+        args (list): Список аргументів, включаючи ім'я контакту.
+
+    Returns:
+        str: Номери телефонів.
+    """
     name = args[0]
     phones = book.find(name).phones
     return f"{Fore.YELLOW}{'; '.join(phone.value for phone in phones)}"
@@ -242,6 +440,15 @@ def show_phones(args, book: AddressBook):
 
 @find_contact_validator
 def find_contact(args, book: AddressBook):
+    """
+    Знаходить контакт за заданим словом.
+
+    Args:
+        args (list): Список аргументів, включаючи слово для пошуку.
+
+    Returns:
+        str: Знайдений контакт або повідомлення про відсутність результатів.
+    """
     search_word = args[0]
     result = book.search_contacts(search_word)
 
@@ -272,10 +479,29 @@ def birthdays(args, book: AddressBook):
         return f"{Fore.YELLOW}Birthdays during {days_count} day(s)\n" + book.get_birthdays_per_week(days_count)
 
 def get_unique_cleaned_non_empty_tags(input_tags: str):
+    """
+    Повертає унікальні, очищені від зайвих пробілів та лапок теги.
+
+    Args:
+        input_tags (str): Рядок тегів, розділених комами.
+
+    Returns:
+        list: Список унікальних тегів.
+    """
     cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
     return list(set(cleaned_tags))
 
+
 def get_note_property(msg):
+    """
+    Отримує властивість нотатки від користувача.
+
+    Args:
+        msg (str): Повідомлення для користувача.
+
+    Returns:
+        str: Введена властивість.
+    """
     while True:
         input_value = input(f"{Fore.BLUE}{msg}")
         if input_value.strip() == 'exit':
@@ -287,6 +513,15 @@ def get_note_property(msg):
 
 @note_error
 def add_note(args, book: NotesBook):
+    """
+    Додає нотатку до блокноту.
+
+    Args:
+        args (list): Список аргументів, включаючи заголовок нотатки.
+
+    Returns:
+        str: Повідомлення про успішне додавання нотатки.
+    """
     title = " ".join(args)
     if (title == ''):
         title = get_note_property("Enter note title: ")
@@ -308,6 +543,15 @@ def add_note(args, book: NotesBook):
 
 @note_error
 def delete_note(args, book: NotesBook):
+    """
+    Видаляє нотатку з блокноту.
+
+    Args:
+        args (list): Список аргументів, включаючи заголовок нотатки.
+
+    Returns:
+        str: Повідомлення про успішне видалення нотатки.
+    """
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
@@ -319,6 +563,15 @@ def delete_note(args, book: NotesBook):
 
 @note_error
 def change_note(args, book: NotesBook):
+    """
+    Змінює нотатку в блокноті.
+
+    Args:
+        args (list): Список аргументів, включаючи заголовок нотатки.
+
+    Returns:
+        str: Повідомлення про успішну зміну нотатки.
+    """
     title = " ".join(args)
     note = book.find_note_by_title(title)
 
@@ -338,11 +591,29 @@ def change_note(args, book: NotesBook):
 
 @note_error
 def show_all_notes(book: NotesBook):
+    """
+    Показує всі нотатки.
+
+    Args:
+        book (NotesBook): Блокнот з нотатками.
+
+    Returns:
+        str: Всі нотатки або повідомлення про їх відсутність.
+    """
     book.print_all_notes()
 
 
 @note_error
 def show_note(args, book: NotesBook):
+    """
+    Показує нотатку за заголовком.
+
+    Args:
+        args (list): Список аргументів, включаючи заголовок нотатки.
+
+    Returns:
+        str: Нотатка або повідомлення про її відсутність.
+    """
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
@@ -353,6 +624,15 @@ def show_note(args, book: NotesBook):
 
 @note_error
 def add_tags(args, book: NotesBook):
+    """
+    Додає теги до нотатки.
+
+    Args:
+        args (list): Список аргументів, включаючи заголовок нотатки.
+
+    Returns:
+        str: Повідомлення про успішне додавання тегів.
+    """
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
@@ -370,6 +650,16 @@ def add_tags(args, book: NotesBook):
 
 @note_error
 def delete_tags(args, book: NotesBook):
+    """
+    Видаляє теги з нотатки у NotesBook.
+
+    Args:
+        args (list): Список аргументів, де перший елемент очікується як назва нотатки.
+        book (NotesBook): Екземпляр класу NotesBook.
+
+    Returns:
+        str: Повідомлення, що вказує результат операції.
+    """
     title = " ".join(args)
     note = book.find_note_by_title(title)
     if (note is not None):
@@ -384,6 +674,16 @@ def delete_tags(args, book: NotesBook):
 
 @note_error
 def search_tags(args, book: NotesBook):
+    """
+    Шукає нотатки за тегами у NotesBook.
+
+    Args:
+        args (list): Список тегів для пошуку.
+        book (NotesBook): Екземпляр класу NotesBook.
+
+    Returns: 
+        None
+    """
     tags = args
     notes = book.find_notes_by_tags(tags)
     if (notes is not None):
@@ -393,6 +693,12 @@ def search_tags(args, book: NotesBook):
 
 
 def load_from_file():
+    """
+    Завантажує адресну книгу та книгу нотаток з файлу.
+
+    Returns:
+        tuple: Кортеж, що містить екземпляри AddressBook та NotesBook, завантажені з файлу.
+    """
     try:
         with open('address_book.pkl', 'rb') as f:
             address_book = pickle.load(f)
@@ -406,6 +712,16 @@ def load_from_file():
 
 
 def save_to_file(address_book, notes_book):
+    """
+    Зберігає адресну книгу та книгу нотаток у файл.
+
+    Args:
+        address_book (AddressBook): Екземпляр класу AddressBook.
+        notes_book (NotesBook): Екземпляр класу NotesBook.
+
+    Returns:
+        None
+    """
     with open('address_book.pkl', 'wb') as f:
         pickle.dump(address_book, f)
     with open('notes_book.pkl', 'wb') as f:
@@ -413,6 +729,7 @@ def save_to_file(address_book, notes_book):
 
 
 def print_all_commands():
+    """ Друкує список команд та їх пояснення. """
     print("Command list:")
     print(f"{Fore.LIGHTGREEN_EX}- add-address {Fore.LIGHTYELLOW_EX}[name] [address]:                {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add an address, str. etc")
     print(f"{Fore.LIGHTGREEN_EX}- add-birthday {Fore.LIGHTYELLOW_EX}[name] [birthdate]:             {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add the birthdate for the specified contact.")
@@ -443,6 +760,18 @@ def print_all_commands():
     
 
 def handle_command(command, args, address_book, notes_book):
+    """
+    Обробляє команди користувача та виконує відповідні дії з адресною книгою та книгою нотаток.
+
+    Args:
+        command (str): Команда, яку потрібно виконати.
+        args (list): Список аргументів, які передаються разом з командою.
+        address_book (AddressBook): Екземпляр класу AddressBook, який містить контакти.
+        notes_book (NotesBook): Екземпляр класу NotesBook, який містить нотатки.
+
+    Returns:
+        None
+    """
     if command == "hello":
         print(Fore.BLUE + "How can I help you?")
     elif command == "add":
@@ -494,6 +823,19 @@ def handle_command(command, args, address_book, notes_book):
 
 
 def main():
+    """
+    Головна функція, яка запускає бот-асистент.
+
+    Завантажує дані з файлів, виводить привітання та перевіряє наявність днів народження.
+    Запускає цикл обробки команд користувача до тих пір, поки не буде введено команду для виходу.
+    Після завершення роботи зберігає дані у файли.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     address_book, notes_book = load_from_file()
 
     print("Welcome to the assistant bot!")
