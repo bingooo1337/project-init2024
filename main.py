@@ -8,6 +8,7 @@ from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import FormattedText
 from colorama import init, Fore
 
+
 init()
 
 def parse_input(user_input):
@@ -443,7 +444,7 @@ def print_all_commands():
     "- close or exit:": "Close the application.",
     "- hello:": "Show text 'How can I help you?'"}
 
-    print("COMMAND LIST:")
+    print(Fore.BLUE + "COMMAND LIST:")
     for command, description in commands.items():
         print(f"{Fore.LIGHTGREEN_EX}{command:<58} {Fore.WHITE}{'|':^1} {Fore.LIGHTBLUE_EX} {description}")
     
@@ -505,11 +506,11 @@ def handle_command(command, args, address_book, notes_book):
 def main():
     address_book, notes_book = load_from_file()
 
-    print("Welcome to the assistant bot!")
+    print(f"{Fore.BLUE}Welcome to the assistant bot!")
     birthdays_today = address_book.today_birthdays()
     if birthdays_today:
         names = ", ".join(birthdays_today)
-        print(f"Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
+        print(f"{Fore.MAGENTA}Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
     print_all_commands()
 
     command_list = WordCompleter([
