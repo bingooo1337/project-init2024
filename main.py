@@ -460,6 +460,15 @@ def find_contact(args, book: AddressBook):
 
 @base_input_validator
 def show_all(book: AddressBook):
+    """
+    Виводить всі контакти з адресної книги.
+
+    Args:
+    book (AddressBook): Екземпляр класу AddressBook, який містить контакти.
+
+    Returns:
+    str: Рядок з усіма контактами або повідомлення про їх відсутність.
+    """
     if (len(book) == 0):
         return "No contacts."
     else:
@@ -469,6 +478,16 @@ def show_all(book: AddressBook):
 @birthdays_input_validator
 @base_input_validator
 def birthdays(args, book: AddressBook):
+    """
+    Виводить контакти, у яких день народження протягом заданої кількості днів.
+
+    Args:
+    args (list): Список аргументів, де перший елемент може бути кількістю днів для перевірки.
+    book (AddressBook): Екземпляр класу AddressBook, який містить контакти.
+
+    Returns:
+    str: Рядок з контактами, у яких день народження протягом заданої кількості днів.
+    """
     if (len(book) == 0):
         return f"{Fore.RED}No contacts."
     else:
@@ -490,7 +509,6 @@ def get_unique_cleaned_non_empty_tags(input_tags: str):
     """
     cleaned_tags = [tag.strip().strip('\'\"') for tag in input_tags.split(',')]
     return list(set(cleaned_tags))
-
 
 def get_note_property(msg):
     """
@@ -681,7 +699,7 @@ def search_tags(args, book: NotesBook):
         args (list): Список тегів для пошуку.
         book (NotesBook): Екземпляр класу NotesBook.
 
-    Returns: 
+    Returns:
         None
     """
     tags = args
@@ -727,37 +745,46 @@ def save_to_file(address_book, notes_book):
     with open('notes_book.pkl', 'wb') as f:
         pickle.dump(notes_book, f)
 
-
 def print_all_commands():
     """ Друкує список команд та їх пояснення. """
-    print("Command list:")
-    print(f"{Fore.LIGHTGREEN_EX}- add-address {Fore.LIGHTYELLOW_EX}[name] [address]:                {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add an address, str. etc")
-    print(f"{Fore.LIGHTGREEN_EX}- add-birthday {Fore.LIGHTYELLOW_EX}[name] [birthdate]:             {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add the birthdate for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- add {Fore.LIGHTYELLOW_EX}[name] [phone]:                          {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a new contact with name and phone number.")
-    print(f"{Fore.LIGHTGREEN_EX}- add-email {Fore.LIGHTYELLOW_EX}[name] [email]:                    {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add an email to the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- add-note {Fore.LIGHTYELLOW_EX}[title] [text]:                     {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a note.")
-    print(f"{Fore.LIGHTGREEN_EX}- add-tags {Fore.LIGHTYELLOW_EX}[title][tag]...[tag]:               {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Add a tag(s) to the note.")
-    print(f"{Fore.LIGHTGREEN_EX}- all:                                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show all contacts in the address book.")
-    print(f"{Fore.LIGHTGREEN_EX}- all-notes:                                   {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show all notes.")
-    print(f"{Fore.LIGHTGREEN_EX}- birthdays:                                   {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show birthdays that will occur within 7 days.")
-    print(f"{Fore.LIGHTGREEN_EX}- birthdays {Fore.LIGHTYELLOW_EX}[days number]:                     {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show birthdays that will occur within the specified number of days.")
-    print(f"{Fore.LIGHTGREEN_EX}- close or exit:                               {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Close the application.")
-    print(f"{Fore.LIGHTGREEN_EX}- change-address {Fore.LIGHTYELLOW_EX}[name] [address]:             {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the address for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- change-email {Fore.LIGHTYELLOW_EX}[name] [old email] [new email]: {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the email for the specified contact by adding from the old email to the new one.")
-    print(f"{Fore.LIGHTGREEN_EX}- change-phone {Fore.LIGHTYELLOW_EX}[name] [old phone] [new phone]: {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change the phone number for the specified contact, transferring from the old to the new.")
-    print(f"{Fore.LIGHTGREEN_EX}- change-note {Fore.LIGHTYELLOW_EX}[title] [text]:                  {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Change a note.")
-    print(f"{Fore.LIGHTGREEN_EX}- delete-contact {Fore.LIGHTYELLOW_EX}[name]:                       {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the entire contact record.")
-    print(f"{Fore.LIGHTGREEN_EX}- delete-note {Fore.LIGHTYELLOW_EX}[title]:                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the note")
-    print(f"{Fore.LIGHTGREEN_EX}- delete-tags {Fore.LIGHTYELLOW_EX}[tag]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Delete the tag.")
-    print(f"{Fore.LIGHTGREEN_EX}- find-contact {Fore.LIGHTYELLOW_EX}[param]:                        {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Display all contact records found by the specified parameter.")
-    print(f"{Fore.LIGHTGREEN_EX}- hello:                                       {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show text 'How can I help you?'")
-    print(f"{Fore.LIGHTGREEN_EX}- phone {Fore.LIGHTYELLOW_EX}[name]:                                {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the phone number for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- search-tag {Fore.LIGHTYELLOW_EX}[tag]:                            {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show notes by tag.")
-    print(f"{Fore.LIGHTGREEN_EX}- show-address {Fore.LIGHTYELLOW_EX}[name]:                         {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the address for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- show-birthday {Fore.LIGHTYELLOW_EX}[name]:                        {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the birthdate for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- show-email {Fore.LIGHTYELLOW_EX}[name]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show the email for the specified contact.")
-    print(f"{Fore.LIGHTGREEN_EX}- show-note {Fore.LIGHTYELLOW_EX}[title]:                           {Fore.WHITE}| {Fore.LIGHTBLUE_EX}Show a note.")
+    commands = {
+        f"- add-address {Fore.LIGHTYELLOW_EX}[name] [address]:": "Add an address, str. etc",
+        f"- add-birthday {Fore.LIGHTYELLOW_EX}[name] [birthdate]:": "Add the birthdate for the specified contact.",
+        f"- add {Fore.LIGHTYELLOW_EX}[name] [phone]:": "Add a new contact with name and phone number.",
+        f"- add-email {Fore.LIGHTYELLOW_EX}[name] [email]:": "Add an email to the specified contact.",
+        f"- add-note {Fore.LIGHTYELLOW_EX}[title]...[add description]...[add tags]:": "Add a note.",
+        f"- add-tags {Fore.LIGHTYELLOW_EX}[title][tag] ... [tags]:": "Add a tag(s) to the note.",
+        f"- birthdays {Fore.LIGHTYELLOW_EX}[days number]:": "Show birthdays that will occur within the specified number of days.",
+        f"- change-address {Fore.LIGHTYELLOW_EX}[name] [address]:": "Change the address for the specified contact.",
+        f"- change-email {Fore.LIGHTYELLOW_EX}[name] [old email] [new email]:": "Change the email for the specified contact by adding from the old email to the new one.",
+        f"- change-phone {Fore.LIGHTYELLOW_EX}[name] [old phone] [new phone]:": "Change the phone number for the specified contact, transferring from the old to the new.",
+        f"- change-note {Fore.LIGHTYELLOW_EX}[title]...[description]...[tags]:": "Change a note.",
+        f"- delete-contact {Fore.LIGHTYELLOW_EX}[name]:": "Delete the entire contact record.",
+        f"- delete-note {Fore.LIGHTYELLOW_EX}[title]:": "Delete the note",
+        f"- delete-tags {Fore.LIGHTYELLOW_EX}[title] ... [tags]:": "Delete the tag.",
+        f"- find-contact {Fore.LIGHTYELLOW_EX}[param]:": "Display all contact records found by the specified parameter.",
+        f"- phone {Fore.LIGHTYELLOW_EX}[name]:": "Show the phone number for the specified contact.",
+        f"- search-tag {Fore.LIGHTYELLOW_EX}[tag]:": "Show notes by tag.",
+        f"- show-address {Fore.LIGHTYELLOW_EX}[name]:": "Show the address for the specified contact.",
+        f"- show-birthday {Fore.LIGHTYELLOW_EX}[name]:": "Show the birthdate for the specified contact.",
+        f"- show-email {Fore.LIGHTYELLOW_EX}[name]:": "Show the email for the specified contact.",
+        f"- show-note {Fore.LIGHTYELLOW_EX}[title]:": "Show a note."
+    }
+
+    commands_without_params = {
+    "- all:": "Show all contacts in the address book.",
+    "- all-notes:": "Show all notes.",
+    "- birthdays:": "Show birthdays that will occur within 7 days.",
+    "- close or exit:": "Close the application.",
+    "- hello:": "Show text 'How can I help you?'"}
+
+    print("COMMAND LIST:")
+    for command, description in commands.items():
+        print(f"{Fore.LIGHTGREEN_EX}{command:<58} {Fore.WHITE}{'|':^1} {Fore.LIGHTBLUE_EX} {description}")
     
+    for command, description in commands_without_params.items():
+        print(f"{Fore.LIGHTGREEN_EX}{command:<53} {Fore.WHITE}{'|':^1} {Fore.LIGHTBLUE_EX} {description}")
+
 
 def handle_command(command, args, address_book, notes_book):
     """
