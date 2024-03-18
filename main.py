@@ -8,6 +8,7 @@ from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import FormattedText
 from colorama import init, Fore
 
+
 init()
 
 def parse_input(user_input):
@@ -509,7 +510,7 @@ def main():
     birthdays_today = address_book.today_birthdays()
     if birthdays_today:
         names = ", ".join(birthdays_today)
-        print(f"Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
+        print(f"{Fore.MAGENTA}Greetings! There are birthdays in your Address Book today!\nDo not forget to congratulate {names}!")
     print_all_commands()
 
     command_list = WordCompleter([
