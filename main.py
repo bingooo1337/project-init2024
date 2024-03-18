@@ -765,7 +765,7 @@ def print_all_commands():
         f"- delete-tags {Fore.LIGHTYELLOW_EX}[title] ... [tags]:": "Delete the tag.",
         f"- find-contact {Fore.LIGHTYELLOW_EX}[param]:": "Display all contact records found by the specified parameter.",
         f"- phone {Fore.LIGHTYELLOW_EX}[name]:": "Show the phone number for the specified contact.",
-        f"- search-tag {Fore.LIGHTYELLOW_EX}[tag]:": "Search notes by tag.",
+        f"- search-tags {Fore.LIGHTYELLOW_EX}[tags]:": "Search notes by tags.",
         f"- show-address {Fore.LIGHTYELLOW_EX}[name]:": "Show the address for the specified contact.",
         f"- show-birthday {Fore.LIGHTYELLOW_EX}[name]:": "Show the birthdate for the specified contact.",
         f"- show-email {Fore.LIGHTYELLOW_EX}[name]:": "Show the email for the specified contact.",
@@ -782,7 +782,7 @@ def print_all_commands():
     print(Fore.BLUE + "COMMAND LIST:")
     for command, description in commands.items():
         print(f"{Fore.LIGHTGREEN_EX}{command:<58} {Fore.WHITE}{'|':^1} {Fore.LIGHTBLUE_EX} {description}")
-    
+
     for command, description in commands_without_params.items():
         print(f"{Fore.LIGHTGREEN_EX}{command:<53} {Fore.WHITE}{'|':^1} {Fore.LIGHTBLUE_EX} {description}")
 
@@ -876,7 +876,7 @@ def main():
     command_list = WordCompleter([
     'add-address', 'add-birthday', 'add', 'add-email', 'add-note', 'add-tags', 'all', 'all-notes',
     'birthdays', 'close', 'exit', 'change-address', 'change-email', 'change-phone', 'change-note',
-    'delete-contact', 'delete-note', 'delete-tags', 'find-contact', 'hello', 'phone', 'search-tag',
+    'delete-contact', 'delete-note', 'delete-tags', 'find-contact', 'hello', 'phone', 'search-tags',
     'show-address', 'show-birthday', 'show-email', 'show-note'])
 
     while True:
